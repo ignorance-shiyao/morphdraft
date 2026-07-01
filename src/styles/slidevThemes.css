@@ -1,0 +1,857 @@
+/* ===== Slidev 引擎主题与布局（应用内移植） =====
+   全部 scope 在 .reveal.slidev-engine 下，与经典 reveal 皮肤体系完全隔离，互不影响。
+   主题色/字体来自 .reveal 上注入的 --sd-* 变量（见 core/slidev/themes.ts）。 */
+
+.reveal.slidev-engine .slide-surface {
+  background: var(--sd-bg);
+  color: var(--sd-fg);
+  font-family: var(--sd-font);
+}
+/* 关掉经典皮肤的顶部主色线，Slidev 自有版式语言 */
+.reveal.slidev-engine .slide-surface.slide-layout-default::before,
+.reveal.slidev-engine .slide-surface.slide-layout-center::before,
+.reveal.slidev-engine .slide-surface.slide-layout-image-left::before,
+.reveal.slidev-engine .slide-surface.slide-layout-image-right::before {
+  content: none;
+}
+.reveal.slidev-engine .slide-surface h1,
+.reveal.slidev-engine .slide-surface h2,
+.reveal.slidev-engine .slide-surface h3,
+.reveal.slidev-engine .slide-surface h4 {
+  font-family: var(--sd-heading-font);
+  color: var(--sd-fg);
+  font-weight: 700;
+  text-wrap: balance;
+}
+.reveal.slidev-engine .slide-surface h1 { color: var(--sd-fg); letter-spacing: -0.03em; }
+.reveal.slidev-engine .slide-surface a { color: var(--sd-primary); }
+.reveal.slidev-engine .slide-surface strong { color: var(--sd-fg); }
+.reveal.slidev-engine .slide-surface code {
+  font-family: var(--sd-mono);
+  background: var(--sd-code-bg);
+  padding: .1em .35em; border-radius: 4px;
+}
+.reveal.slidev-engine .slide-surface pre {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sd-primary) 5%, transparent), transparent 42%),
+    var(--sd-code-bg);
+  border: 1px solid color-mix(in srgb, var(--sd-border) 88%, transparent);
+  border-radius: var(--sd-radius);
+  box-shadow: var(--sd-shadow);
+}
+.reveal.slidev-engine .slide-surface blockquote {
+  border-left: 3px solid var(--sd-primary);
+  color: color-mix(in srgb, var(--sd-muted) 82%, var(--sd-fg));
+  background: color-mix(in srgb, var(--sd-primary) 5%, var(--sd-panel));
+  border-radius: 0 var(--sd-radius) var(--sd-radius) 0;
+}
+.reveal.slidev-engine .slide-surface hr {
+  border: none;
+  height: 1px;
+  margin: 0.9em 0;
+  background: linear-gradient(90deg, var(--sd-primary), color-mix(in srgb, var(--sd-primary) 12%, transparent));
+}
+
+/* —— 统一排版节奏（所有布局/主题共享）：块间距、标题层级、列表/引用/代码/表格/图片 —— */
+/* 内容容器内的块级元素之间用一致的上间距；首块去顶距 */
+.reveal.slidev-engine .slidev-block > * + *,
+.reveal.slidev-engine .slidev-col > * + *,
+.reveal.slidev-engine .slidev-col-text > * + * { margin-top: 0.72em; }
+.reveal.slidev-engine .slidev-block > :first-child,
+.reveal.slidev-engine .slidev-col > :first-child,
+.reveal.slidev-engine .slidev-col-text > :first-child { margin-top: 0; }
+
+.reveal.slidev-engine .slide-surface h1 { font-size: 1.9em; line-height: 1.15; margin: 0 0 0.5em; }
+.reveal.slidev-engine .slide-surface h2 { font-size: 1.45em; line-height: 1.2; margin: 0 0 0.45em; }
+.reveal.slidev-engine .slide-surface h3 { font-size: 1.15em; line-height: 1.25; margin: 0 0 0.35em; color: var(--sd-primary); }
+.reveal.slidev-engine .slide-surface h4 { font-size: 1em; margin: 0 0 0.3em; }
+.reveal.slidev-engine .slide-surface p { line-height: 1.55; margin: 0; }
+
+/* 列表：缩进 + 行距 + 主色项目符号 */
+.reveal.slidev-engine .slide-surface ul,
+.reveal.slidev-engine .slide-surface ol { margin: 0; padding-left: 1.3em; line-height: 1.5; }
+.reveal.slidev-engine .slide-surface li { margin: 0.28em 0; }
+.reveal.slidev-engine .slide-surface li::marker { color: var(--sd-primary); }
+.reveal.slidev-engine .slide-surface ul ul,
+.reveal.slidev-engine .slide-surface ul ol,
+.reveal.slidev-engine .slide-surface ol ul { margin-top: 0.2em; }
+
+/* 引用：左主色条 + 轻底，留白舒展 */
+.reveal.slidev-engine .slide-surface blockquote {
+  margin: 0;
+  padding: 0.55em 0.9em;
+}
+.reveal.slidev-engine .slide-surface blockquote p { margin: 0; }
+
+/* 代码块：舒适内距 + 字号收敛 + 内部滚动不溢出版心 */
+.reveal.slidev-engine .slide-surface pre {
+  margin: 0;
+  padding: 0.78em 0.95em;
+  font-size: 0.82em;
+  line-height: 1.5;
+  overflow: auto;
+  max-height: 100%;
+}
+.reveal.slidev-engine .slide-surface pre code { background: none; padding: 0; }
+
+/* 图片：圆角 + 轻阴影 */
+.reveal.slidev-engine .slide-surface img {
+  max-width: 100%;
+  height: auto;
+  border-radius: calc(var(--sd-radius) - 2px);
+  border: 1px solid color-mix(in srgb, var(--sd-border) 82%, transparent);
+  box-shadow: var(--sd-shadow);
+}
+
+/* 表格：圆角表面 + 斑马纹 */
+.reveal.slidev-engine .slide-surface table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 0.86em;
+  border: 1px solid color-mix(in srgb, var(--sd-border) 88%, transparent);
+  border-radius: var(--sd-radius);
+  overflow: hidden;
+  background: var(--sd-panel);
+  box-shadow: var(--sd-shadow);
+}
+.reveal.slidev-engine .slide-surface th,
+.reveal.slidev-engine .slide-surface td {
+  border: 0;
+  border-right: 1px solid color-mix(in srgb, var(--sd-border) 72%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--sd-border) 72%, transparent);
+  padding: 0.42em 0.68em;
+  text-align: left;
+}
+.reveal.slidev-engine .slide-surface tr > :last-child { border-right: 0; }
+.reveal.slidev-engine .slide-surface tbody tr:last-child > * { border-bottom: 0; }
+.reveal.slidev-engine .slide-surface th {
+  background: color-mix(in srgb, var(--sd-primary) 10%, var(--sd-panel));
+  color: color-mix(in srgb, var(--sd-fg) 86%, var(--sd-primary));
+  font-weight: 750;
+}
+.reveal.slidev-engine .slide-surface tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--sd-primary) 3.5%, var(--sd-panel));
+}
+
+/* —— 布局 —— */
+/* default：左上对齐顺排 */
+.reveal.slidev-engine .slidev-layout-default .slide-inner { display: block; }
+
+/* center / statement：整体居中（视觉略高于几何中心，配重更舒服） */
+.reveal.slidev-engine .slidev-layout-center .slide-inner,
+.reveal.slidev-engine .slidev-layout-statement .slide-inner,
+.reveal.slidev-engine .slidev-layout-fact .slide-inner {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.reveal.slidev-engine .slidev-layout-center .slidev-block,
+.reveal.slidev-engine .slidev-layout-statement .slidev-block {
+  max-width: 80%; margin-top: -3%; /* 光学居中：略上提 */
+}
+.reveal.slidev-engine .slidev-layout-fact h1,
+.reveal.slidev-engine .slidev-layout-fact .slidev-block > :first-child {
+  font-size: 3.4em; line-height: 1; color: var(--sd-primary); margin: 0 0 0.2em;
+}
+.reveal.slidev-engine .slidev-layout-fact p { font-size: 1.2em; color: var(--sd-muted); }
+
+/* cover / intro：封面——大标题 + 副文，垂直居中偏左 */
+.reveal.slidev-engine .slidev-layout-cover .slide-inner,
+.reveal.slidev-engine .slidev-layout-intro .slide-inner {
+  display: flex; flex-direction: column; justify-content: center;
+}
+.reveal.slidev-engine .slidev-layout-cover .slidev-block,
+.reveal.slidev-engine .slidev-layout-intro .slidev-block { max-width: 80%; }
+.reveal.slidev-engine .slidev-layout-cover h1,
+.reveal.slidev-engine .slidev-layout-intro h1 {
+  font-size: clamp(2.4em, 6vw, 3.15em);
+  line-height: 1.04;
+  margin: 0 0 0.35em;
+  letter-spacing: -0.035em;
+  font-weight: 750;
+}
+/* 封面标题下的主色短横 */
+.reveal.slidev-engine .slidev-layout-cover h1::after,
+.reveal.slidev-engine .slidev-layout-intro h1::after {
+  content: "";
+  display: block;
+  width: 2.4em;
+  height: 3px;
+  margin-top: 0.34em;
+  background: var(--sd-primary);
+  border-radius: 99px;
+}
+.reveal.slidev-engine .slidev-layout-cover p,
+.reveal.slidev-engine .slidev-layout-intro p {
+  color: var(--sd-muted);
+  font-size: 1.12em;
+  max-width: 34ch;
+  line-height: 1.5;
+}
+
+/* section / quote：分节大字，垂直居中 */
+.reveal.slidev-engine .slidev-layout-section .slide-inner,
+.reveal.slidev-engine .slidev-layout-quote .slide-inner {
+  display: flex; flex-direction: column; justify-content: center;
+}
+.reveal.slidev-engine .slidev-layout-section h1,
+.reveal.slidev-engine .slidev-layout-section h2 {
+  font-size: 2.6em; line-height: 1.1; border-left: 6px solid var(--sd-primary);
+  padding-left: 0.5em; margin: 0;
+}
+.reveal.slidev-engine .slidev-layout-quote { font-style: italic; }
+.reveal.slidev-engine .slidev-layout-quote .slide-inner { font-size: 1.5em; line-height: 1.4; }
+.reveal.slidev-engine .slidev-layout-statement .slide-inner { font-size: 1.6em; line-height: 1.3; }
+
+/* two-cols / two-cols-header */
+.reveal.slidev-engine .slidev-cols {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; height: 100%;
+}
+.reveal.slidev-engine .slidev-cols-header { margin-bottom: .6em; }
+.reveal.slidev-engine .slidev-col { min-width: 0; overflow: auto; }
+
+/* image-right / image-left：文字 + 整幅图。图侧略宽（5:6），更接近 Slidev 观感 */
+.reveal.slidev-engine .slidev-image-split {
+  display: grid; gap: 1.8em; height: 100%; align-items: center;
+}
+.reveal.slidev-engine .slidev-image-split.image-right { grid-template-columns: 5fr 6fr; }
+.reveal.slidev-engine .slidev-image-split.image-left { grid-template-columns: 6fr 5fr; }
+.reveal.slidev-engine .slidev-col-text { min-width: 0; overflow: auto; }
+.reveal.slidev-engine .slidev-col-image {
+  height: 100%; border-radius: 10px;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+}
+.reveal.slidev-engine .slidev-col-image.is-empty {
+  background: var(--sd-code-bg); border: 1px dashed var(--sd-border);
+}
+
+/* image：整幅背景图 + 可选叠加文字块 */
+.reveal.slidev-engine .slidev-layout-image .slide-inner { padding: 0; }
+.reveal.slidev-engine .slidev-image-full {
+  position: relative; height: 100%; width: 100%;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  display: flex; align-items: flex-end;
+}
+.reveal.slidev-engine .slidev-image-full.is-empty { background: var(--sd-code-bg); }
+.reveal.slidev-engine .slidev-image-caption {
+  width: 100%; padding: 0.7em 1em;
+  background: linear-gradient(transparent, color-mix(in srgb, #000 62%, transparent));
+  color: #fff;
+}
+.reveal.slidev-engine .slidev-image-caption :is(h1,h2,h3,p,strong,a) { color: #fff; }
+
+/* iframe：full 铺满；left/right 文字 + iframe 分栏 */
+.reveal.slidev-engine .slidev-layout-iframe .slide-inner { padding: 0; }
+.reveal.slidev-engine .slidev-iframe-full { height: 100%; width: 100%; }
+.reveal.slidev-engine .slidev-iframe-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.6em; height: 100%; align-items: stretch;
+}
+.reveal.slidev-engine .slidev-iframe {
+  width: 100%; height: 100%; border: 1px solid var(--sd-border); border-radius: 10px; background: #fff;
+}
+.reveal.slidev-engine .slidev-iframe.is-empty { background: var(--sd-code-bg); border-style: dashed; }
+.reveal.slidev-engine .slidev-iframe-split .slidev-col-text { align-self: center; }
+
+/* full：内容铺满、无居中约束 */
+.reveal.slidev-engine .slidev-layout-full .slide-inner { display: block; }
+
+/* end：收尾页，整体居中、稍大 */
+.reveal.slidev-engine .slidev-layout-end .slide-inner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+}
+.reveal.slidev-engine .slidev-layout-end h1 { font-size: 2.6em; }
+
+/* —— 主题专属调性 —— */
+/* seriph：标题衬线、字距收敛 */
+.reveal.slidev-engine.slidev-theme-seriph .slide-surface h1,
+.reveal.slidev-engine.slidev-theme-seriph .slide-surface h2 { letter-spacing: -0.01em; }
+
+/* apple-basic：超大轻量标题、加大留白、弱化正文色阶 */
+.reveal.slidev-engine.slidev-theme-apple-basic .slide-surface { padding: 6% 8%; }
+.reveal.slidev-engine.slidev-theme-apple-basic .slide-surface h1 { font-weight: 600; letter-spacing: -0.02em; }
+.reveal.slidev-engine.slidev-theme-apple-basic .slidev-layout-cover h1 { font-size: 3.2em; }
+.reveal.slidev-engine.slidev-theme-apple-basic .slide-surface p { color: var(--sd-muted); }
+
+/* bricks：等宽标题 + 主色块状下划，砖块调性 */
+.reveal.slidev-engine.slidev-theme-bricks .slide-surface h1,
+.reveal.slidev-engine.slidev-theme-bricks .slide-surface h2 { color: var(--sd-primary); text-transform: none; }
+.reveal.slidev-engine.slidev-theme-bricks .slidev-layout-section h1 { border-left-width: 10px; }
+.reveal.slidev-engine.slidev-theme-bricks .slide-surface strong { color: var(--sd-primary); }
+
+/* shibainu：暖色调，标题下细线 */
+.reveal.slidev-engine.slidev-theme-shibainu .slide-surface h1 { border-bottom: 2px solid var(--sd-border); padding-bottom: .15em; }
+
+/* frankfurt（暗）：封面大标题用主色点缀 */
+.reveal.slidev-engine.slidev-theme-frankfurt .slidev-layout-cover h1,
+.reveal.slidev-engine.slidev-theme-frankfurt .slidev-layout-section h1 { color: var(--sd-primary); }
+.reveal.slidev-engine.slidev-theme-frankfurt .slide-surface a { color: var(--sd-primary); }
+
+/* geist：极简黑白，标题等宽 + 字距收紧；分节用细线而非色块 */
+.reveal.slidev-engine.slidev-theme-geist .slide-surface h1 { letter-spacing: -0.03em; }
+.reveal.slidev-engine.slidev-theme-geist .slidev-layout-section h1,
+.reveal.slidev-engine.slidev-theme-geist .slidev-layout-section h2 { border-left: none; border-bottom: 2px solid var(--sd-fg); padding-left: 0; padding-bottom: .2em; }
+
+/* 暗色系（nuxt/purplin/dracula）：封面 / 分节标题用主色 */
+.reveal.slidev-engine.slidev-theme-nuxt .slidev-layout-cover h1,
+.reveal.slidev-engine.slidev-theme-nuxt .slidev-layout-section h1,
+.reveal.slidev-engine.slidev-theme-purplin .slidev-layout-cover h1,
+.reveal.slidev-engine.slidev-theme-purplin .slidev-layout-section h1,
+.reveal.slidev-engine.slidev-theme-dracula .slidev-layout-cover h1,
+.reveal.slidev-engine.slidev-theme-dracula .slidev-layout-section h1 { color: var(--sd-primary); }
+
+/* —— 页面骨架：克制页码 + 可选文稿名，避免模板感英文眉标 —— */
+.reveal.slidev-engine {
+  counter-reset: slidev-page;
+}
+
+.reveal.slidev-engine .slide-surface {
+  counter-increment: slidev-page;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 6.4% 7.4% 5.6%;
+  background: var(--sd-bg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sd-border) 55%, transparent);
+}
+
+.reveal.slidev-engine .slide-surface::after {
+  content: counter(slidev-page, decimal-leading-zero);
+  position: absolute;
+  right: 3.4%;
+  bottom: 2.6%;
+  z-index: 4;
+  color: color-mix(in srgb, var(--sd-muted) 78%, transparent);
+  font: 600 0.56em/1 var(--sd-mono);
+  letter-spacing: 0.1em;
+}
+
+.reveal.slidev-engine .slide-surface .slide-inner {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.reveal.slidev-engine .slidev-has-title h1:first-child {
+  max-width: 88%;
+  margin-bottom: 0.76em;
+  font-size: 2.08em;
+  line-height: 1.06;
+  letter-spacing: -0.038em;
+  font-weight: 780;
+}
+
+/* 主题装饰层（各主题可覆盖位置/形状） */
+.reveal.slidev-engine .slidev-has-title::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 文稿名（来自 frontmatter title），无则隐藏 */
+.reveal.slidev-engine .slidev-has-title h1:first-child::before {
+  content: var(--sd-deck-title, none);
+  display: block;
+  margin-bottom: 0.72em;
+  color: color-mix(in srgb, var(--sd-primary) 72%, var(--sd-muted));
+  font: 650 0.26em/1.2 var(--sd-font);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+.reveal.slidev-engine .slidev-has-title h1:first-child::after {
+  content: "";
+  display: block;
+  width: 2.4em;
+  height: 2px;
+  margin-top: 0.38em;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--sd-primary) 82%, var(--sd-border));
+}
+
+.reveal.slidev-engine .slide-surface[data-autopage] .slide-inner {
+  display: block;
+  align-items: initial;
+  justify-content: initial;
+  text-align: left;
+}
+
+.reveal.slidev-engine .slide-surface[data-autopage]::before {
+  content: "续页 · " attr(data-autopage);
+  position: absolute;
+  top: 3.6%;
+  right: 3.4%;
+  color: color-mix(in srgb, var(--sd-primary) 70%, var(--sd-muted));
+  font: 650 0.54em/1 var(--sd-font);
+  letter-spacing: 0.04em;
+}
+
+.reveal.slidev-engine .slide-surface[data-autopage] h1[data-auto-repeat] {
+  max-width: 80%;
+  margin-bottom: 0.62em;
+  color: var(--sd-muted);
+  font-size: 1.14em;
+  letter-spacing: -0.012em;
+  font-weight: 650;
+}
+
+.reveal.slidev-engine .slide-surface[data-autopage] h1[data-auto-repeat]::before,
+.reveal.slidev-engine .slide-surface[data-autopage] h1[data-auto-repeat]::after {
+  content: none;
+}
+
+.reveal.slidev-engine .slide-surface :is(.chart-card, .callout, blockquote) {
+  border: 1px solid color-mix(in srgb, var(--sd-border) 86%, transparent);
+  border-radius: var(--sd-radius);
+  background: var(--sd-panel);
+  box-shadow: var(--sd-shadow);
+}
+
+.reveal.slidev-engine .slidev-cols > .slidev-col + .slidev-col,
+.reveal.slidev-engine .slidev-iframe-split > :last-child {
+  padding-left: 1.5em;
+  border-left: 1px solid color-mix(in srgb, var(--sd-border) 72%, transparent);
+}
+
+.reveal.slidev-engine .slidev-layout-cover,
+.reveal.slidev-engine .slidev-layout-intro {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--sd-primary) 14%, transparent), transparent 36%),
+    linear-gradient(145deg, color-mix(in srgb, var(--sd-primary) 6%, var(--sd-bg)), var(--sd-bg) 58%);
+}
+
+.reveal.slidev-engine .slidev-layout-cover::before,
+.reveal.slidev-engine .slidev-layout-intro::before {
+  content: "";
+  position: absolute;
+  inset: auto -8% -28% auto;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--sd-primary) 22%, transparent);
+  background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--sd-primary) 8%, transparent), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.reveal.slidev-engine .slidev-layout-cover .slidev-block,
+.reveal.slidev-engine .slidev-layout-intro .slidev-block {
+  position: relative;
+  z-index: 2;
+  max-width: 64%;
+}
+
+.reveal.slidev-engine .slidev-layout-cover h1::before,
+.reveal.slidev-engine .slidev-layout-intro h1::before,
+.reveal.slidev-engine .slidev-layout-section h1::before,
+.reveal.slidev-engine .slidev-layout-section h2::before {
+  content: none;
+}
+
+.reveal.slidev-engine .slidev-layout-section {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--sd-primary) 10%, var(--sd-bg)), var(--sd-bg));
+}
+
+.reveal.slidev-engine .slidev-layout-section h1,
+.reveal.slidev-engine .slidev-layout-section h2 {
+  border-left: none;
+  padding-left: 0;
+  text-align: center;
+  max-width: 82%;
+  margin-inline: auto;
+  border-top: 1px solid color-mix(in srgb, var(--sd-primary) 34%, var(--sd-border));
+  border-bottom: 1px solid color-mix(in srgb, var(--sd-primary) 34%, var(--sd-border));
+  padding-block: 0.42em;
+}
+
+/* ===== 官方画廊主题的独立视觉语言 ===== */
+
+/* Default：编辑网格 + 左侧装订线。 */
+.reveal.slidev-engine.slidev-theme-default .slide-surface {
+  background:
+    radial-gradient(circle at 1px 1px, rgba(24, 24, 27, .06) .65px, transparent .75px) 0 0 / 24px 24px,
+    linear-gradient(90deg, color-mix(in srgb, var(--sd-primary) 5%, transparent), transparent 26%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-default .slidev-has-title::before {
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--sd-primary), color-mix(in srgb, var(--sd-primary) 42%, transparent));
+}
+
+/* Seriph：纸张、书页双线和古典首字感。 */
+.reveal.slidev-engine.slidev-theme-seriph .slide-surface {
+  background:
+    linear-gradient(90deg, transparent 6%, color-mix(in srgb, var(--sd-primary) 16%, transparent) 6.1%, transparent 6.25%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-seriph .slidev-has-title::before {
+  inset: 0 auto 0 4.8%;
+  width: 2px;
+  background: color-mix(in srgb, var(--sd-primary) 55%, var(--sd-border));
+}
+.reveal.slidev-engine.slidev-theme-seriph .slidev-has-title h1:first-child::before {
+  font-family: var(--sd-heading-font);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+.reveal.slidev-engine.slidev-theme-seriph blockquote { font-family: var(--sd-heading-font); font-size: 1.08em; }
+
+/* Apple Basic：纯净留白、超轻分隔线，无技术网格。 */
+.reveal.slidev-engine.slidev-theme-apple-basic .slide-surface {
+  background: var(--sd-bg);
+  padding: 7.5% 9%;
+}
+.reveal.slidev-engine.slidev-theme-apple-basic .slidev-has-title::before { content: none; }
+.reveal.slidev-engine.slidev-theme-apple-basic .slidev-has-title h1:first-child::before { content: none; }
+.reveal.slidev-engine.slidev-theme-apple-basic .slidev-has-title h1:first-child::after {
+  width: 100%; height: 1px; background: var(--sd-border);
+}
+.reveal.slidev-engine.slidev-theme-apple-basic .slide-surface::after { font-family: var(--sd-font); }
+
+/* Bricks：模块化色块、硬边与阶梯装饰。 */
+.reveal.slidev-engine.slidev-theme-bricks .slide-surface {
+  background:
+    linear-gradient(90deg, var(--sd-primary) 0 3.2%, transparent 3.2%),
+    linear-gradient(0deg, color-mix(in srgb, var(--sd-primary) 12%, transparent) 0 10%, transparent 10%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-bricks .slidev-has-title::before {
+  inset: auto 3.2% 3.4% auto; width: 18%; height: 8%; background: var(--sd-primary);
+  box-shadow: -2.5em -1.6em 0 color-mix(in srgb, var(--sd-primary) 60%, var(--sd-bg));
+}
+.reveal.slidev-engine.slidev-theme-bricks .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-bricks :is(pre, blockquote, .chart-card) { border-radius: 0; }
+
+/* Shibainu：暖纸、圆角贴纸和松弛排版。 */
+.reveal.slidev-engine.slidev-theme-shibainu .slide-surface {
+  background:
+    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--sd-primary) 18%, transparent) 0 5%, transparent 5.2%),
+    radial-gradient(circle at 86% 15%, color-mix(in srgb, var(--sd-primary) 10%, transparent) 0 8%, transparent 8.2%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-shibainu .slidev-has-title::before {
+  inset: 7% auto auto 4%; width: 18px; height: 18px; border-radius: 50%;
+  box-shadow: 24px 0 0 color-mix(in srgb, var(--sd-primary) 55%, transparent);
+}
+.reveal.slidev-engine.slidev-theme-shibainu .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-shibainu :is(pre, blockquote, .chart-card) { border-radius: 18px; }
+
+/* Geist / Vercel：黑白坐标系与像素十字。 */
+.reveal.slidev-engine.slidev-theme-geist .slide-surface {
+  background:
+    linear-gradient(var(--sd-border) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--sd-border) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-geist .slidev-has-title::before {
+  inset: 4% auto auto 3.5%; width: 10px; height: 10px; background: var(--sd-fg);
+  box-shadow: 14px 0 var(--sd-bg), 14px 0 0 1px var(--sd-fg);
+}
+.reveal.slidev-engine.slidev-theme-geist .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-geist :is(pre, blockquote, .chart-card) { border-radius: 0; box-shadow: none; }
+
+/* Light Icons：轻盈蓝图、浮动图标圆片。 */
+.reveal.slidev-engine.slidev-theme-light-icons .slide-surface {
+  background:
+    radial-gradient(circle at 90% 13%, color-mix(in srgb, var(--sd-primary) 13%, transparent) 0 7%, transparent 7.2%),
+    linear-gradient(135deg, transparent 80%, color-mix(in srgb, var(--sd-primary) 6%, transparent) 80%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-light-icons .slidev-has-title::before {
+  inset: 5% 5% auto auto; width: 52px; height: 52px; border-radius: 16px;
+  background: color-mix(in srgb, var(--sd-primary) 14%, var(--sd-bg));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sd-primary) 25%, transparent), 0 14px 28px rgba(59,130,246,.16);
+}
+.reveal.slidev-engine.slidev-theme-light-icons .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+
+/* Eloc：紧凑编辑部、红色裁切标与大页码。 */
+.reveal.slidev-engine.slidev-theme-eloc .slide-surface {
+  background:
+    linear-gradient(90deg, var(--sd-primary) 0 1.1%, transparent 1.1%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-eloc .slidev-has-title::before {
+  inset: 4% auto auto 4%; width: 28px; height: 4px; background: var(--sd-primary);
+  box-shadow: 0 8px var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-eloc .slidev-has-title h1:first-child {
+  text-transform: uppercase; max-width: 72%; line-height: .98;
+}
+.reveal.slidev-engine.slidev-theme-eloc .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-eloc .slide-surface::after { font-size: 1em; color: var(--sd-primary); }
+
+/* Purplin：底栏是主题身份，内容区保持暗紫高对比。 */
+.reveal.slidev-engine.slidev-theme-purplin .slide-surface {
+  background:
+    linear-gradient(0deg, var(--sd-primary) 0 5.5%, transparent 5.5%),
+    radial-gradient(circle at 85% 18%, rgba(168,85,247,.18), transparent 26%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-purplin .slidev-has-title::before { content: none; }
+.reveal.slidev-engine.slidev-theme-purplin .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-purplin .slide-surface::after { color: #fff; bottom: 1.8%; }
+
+/* Unicorn：深夜霓虹、粉蓝双轨。 */
+.reveal.slidev-engine.slidev-theme-unicorn .slide-surface {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(34,211,238,.16), transparent 25%),
+    radial-gradient(circle at 92% 80%, rgba(244,114,182,.18), transparent 28%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-unicorn .slidev-has-title::before {
+  width: 5px; background: linear-gradient(#22d3ee, #f472b6);
+  box-shadow: 12px 0 28px rgba(244,114,182,.45);
+}
+.reveal.slidev-engine.slidev-theme-unicorn .slidev-has-title h1:first-child {
+  text-shadow: 0 0 22px rgba(244,114,182,.25);
+}
+.reveal.slidev-engine.slidev-theme-unicorn .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+
+/* Zhozhoba：日落色块和杂志留白。 */
+.reveal.slidev-engine.slidev-theme-zhozhoba .slide-surface {
+  background:
+    linear-gradient(120deg, transparent 72%, color-mix(in srgb, var(--sd-primary) 16%, transparent) 72%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-zhozhoba .slidev-has-title::before {
+  inset: 0 0 auto auto; width: 32%; height: 12px; background: var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-zhozhoba .slidev-has-title h1:first-child::before {
+  font-family: var(--sd-heading-font);
+}
+
+/* Penguin：冷色圆角卡片和冰层分割。 */
+.reveal.slidev-engine.slidev-theme-penguin .slide-surface {
+  background:
+    linear-gradient(155deg, transparent 66%, color-mix(in srgb, var(--sd-primary) 8%, transparent) 66%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-penguin .slidev-has-title::before {
+  inset: 5% auto auto 4%; width: 12px; height: 34px; border-radius: 8px;
+  background: var(--sd-primary); transform: rotate(18deg);
+}
+.reveal.slidev-engine.slidev-theme-penguin .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-penguin :is(pre, blockquote, .chart-card) { border-radius: 16px; }
+
+/* Vuetiful：Vue V 形几何构图。 */
+.reveal.slidev-engine.slidev-theme-vuetiful .slide-surface {
+  background:
+    linear-gradient(150deg, transparent 78%, rgba(66,184,131,.16) 78% 86%, transparent 86%),
+    linear-gradient(210deg, transparent 80%, rgba(53,73,94,.12) 80% 88%, transparent 88%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-vuetiful .slidev-has-title::before {
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: #42b883;
+}
+.reveal.slidev-engine.slidev-theme-vuetiful .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+
+/* Takahashi：一页一个观点，超大黑字与红色短标。 */
+.reveal.slidev-engine.slidev-theme-takahashi .slide-surface { background: var(--sd-bg); padding: 8%; }
+.reveal.slidev-engine.slidev-theme-takahashi .slidev-has-title::before { content: none; }
+.reveal.slidev-engine.slidev-theme-takahashi .slidev-has-title h1:first-child {
+  max-width: 94%; font-size: 3.25em; line-height: .95; text-align: center; margin: 12% auto 0;
+}
+.reveal.slidev-engine.slidev-theme-takahashi .slidev-has-title h1:first-child::before { content: none; }
+.reveal.slidev-engine.slidev-theme-takahashi .slidev-has-title h1:first-child::after {
+  width: 1.2em; height: 7px; margin: .34em auto 0; background: var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-takahashi .slidev-layout-cover .slidev-block { max-width: 100%; }
+
+/* Academic：论文页眉、双栏友好和脚注基线。 */
+.reveal.slidev-engine.slidev-theme-academic .slide-surface {
+  background:
+    linear-gradient(0deg, var(--sd-border) 0 1px, transparent 1px) 0 calc(100% - 7%) / 100% 100%,
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-academic .slidev-has-title::before {
+  inset: 0 0 auto 0; width: 100%; height: 8px; background: var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-academic .slidev-has-title h1:first-child::before {
+  font-family: var(--sd-font);
+  letter-spacing: 0.03em;
+}
+.reveal.slidev-engine.slidev-theme-academic .slide-surface p { text-align: justify; }
+
+/* Mokkapps：开发者暗色、荧光绿命令行提示。 */
+.reveal.slidev-engine.slidev-theme-mokkapps .slide-surface {
+  background:
+    linear-gradient(90deg, rgba(163,230,53,.04), transparent 28%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-mokkapps .slidev-has-title::before {
+  inset: 5% auto auto 4%; width: 14px; height: 14px; border-radius: 50%;
+  background: #ef4444; box-shadow: 22px 0 #f59e0b, 44px 0 #a3e635;
+}
+.reveal.slidev-engine.slidev-theme-mokkapps .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-mokkapps pre { box-shadow: 0 0 0 1px rgba(163,230,53,.18), 0 20px 45px rgba(0,0,0,.24); }
+
+/* The unnamed：VS Code 活动栏、粉色光标与青色状态栏。 */
+.reveal.slidev-engine.slidev-theme-the-unnamed .slide-surface {
+  background:
+    linear-gradient(90deg, #111c2e 0 4.2%, transparent 4.2%),
+    linear-gradient(0deg, #0b6f79 0 4%, transparent 4%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-the-unnamed .slidev-has-title::before {
+  inset: 9% auto auto 1.5%; width: 10px; height: 10px; border: 2px solid var(--sd-primary);
+  background: transparent; box-shadow: 0 28px 0 -2px #22d3ee, 0 56px 0 -2px #facc15;
+}
+.reveal.slidev-engine.slidev-theme-the-unnamed .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); color: #22d3ee; }
+
+/* Dracula：终端窗口与经典五色语法高亮。 */
+.reveal.slidev-engine.slidev-theme-dracula .slide-surface {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(189,147,249,.14), transparent 24%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-dracula .slidev-has-title::before {
+  inset: 5% auto auto 4%; width: 12px; height: 12px; border-radius: 50%;
+  background: #ff5555; box-shadow: 20px 0 #f1fa8c, 40px 0 #50fa7b;
+}
+.reveal.slidev-engine.slidev-theme-dracula .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); color: #8be9fd; }
+.reveal.slidev-engine.slidev-theme-dracula strong { color: #ff79c6; }
+
+/* Frankfurt：Beamer 顶部导航点阵和青绿色结构线。 */
+.reveal.slidev-engine.slidev-theme-frankfurt .slide-surface {
+  background:
+    linear-gradient(0deg, rgba(79,209,197,.08), transparent 32%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-frankfurt .slidev-has-title::before {
+  inset: 3.5% 4% auto auto; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sd-primary);
+  box-shadow: -15px 0 rgba(79,209,197,.7), -30px 0 rgba(79,209,197,.45), -45px 0 rgba(79,209,197,.22);
+}
+.reveal.slidev-engine.slidev-theme-frankfurt .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+
+/* HEP：高能物理蓝图、轴线与实验编号。 */
+.reveal.slidev-engine.slidev-theme-hep .slide-surface {
+  background:
+    linear-gradient(90deg, rgba(0,91,187,.07) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(rgba(0,91,187,.07) 1px, transparent 1px) 0 0 / 48px 48px,
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-hep .slidev-has-title::before {
+  inset: 0 auto 0 0; width: 10px; background: linear-gradient(#005bbb 0 62%, #ffd500 62%);
+}
+.reveal.slidev-engine.slidev-theme-hep .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-hep .slide-surface::after { color: var(--sd-primary); }
+
+/* Excali-slide：手绘边框、荧光笔与不完美旋转。 */
+.reveal.slidev-engine.slidev-theme-excali-slide .slide-surface {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(37,35,42,.055) 28px),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-excali-slide .slidev-has-title::before {
+  inset: 5% auto auto 4%; width: 34px; height: 20px; border: 3px solid var(--sd-primary);
+  background: transparent; transform: rotate(-7deg); border-radius: 48% 52% 46% 54%;
+}
+.reveal.slidev-engine.slidev-theme-excali-slide .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-excali-slide :is(pre, blockquote, .chart-card) {
+  border: 2px solid var(--sd-fg); border-radius: 8px 13px 7px 11px; box-shadow: 5px 5px 0 color-mix(in srgb, var(--sd-primary) 20%, transparent);
+  transform: rotate(-.15deg);
+}
+
+/* Mint：植物线稿、柔和绿层次。 */
+.reveal.slidev-engine.slidev-theme-mint .slide-surface {
+  background:
+    radial-gradient(ellipse at 100% 100%, rgba(16,185,129,.14), transparent 35%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-mint .slidev-has-title::before {
+  inset: auto -2% -12% auto; width: 30%; height: 54%; border: 2px solid rgba(16,185,129,.25);
+  border-radius: 100% 0 100% 0; background: transparent; transform: rotate(-12deg);
+}
+.reveal.slidev-engine.slidev-theme-mint .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); font-family: var(--sd-heading-font); }
+.reveal.slidev-engine.slidev-theme-mint :is(pre, blockquote, .chart-card) { border-radius: 22px 6px 22px 6px; }
+
+/* Neversink：教育海报、橙色胶带和波浪线。 */
+.reveal.slidev-engine.slidev-theme-neversink .slide-surface {
+  background:
+    linear-gradient(7deg, transparent 82%, rgba(240,90,40,.12) 82% 88%, transparent 88%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-neversink .slidev-has-title::before {
+  inset: 4% auto auto 5%; width: 90px; height: 22px; background: rgba(240,90,40,.24);
+  transform: rotate(-3deg);
+}
+.reveal.slidev-engine.slidev-theme-neversink .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-neversink .slidev-has-title h1:first-child::after { border-radius: 50%; height: 5px; transform: rotate(-1deg); }
+
+/* ktym4a：Catppuccin 色带与旋转卡片。 */
+.reveal.slidev-engine.slidev-theme-ktym4a .slide-surface {
+  background:
+    radial-gradient(circle at 88% 15%, rgba(203,166,247,.16), transparent 25%),
+    radial-gradient(circle at 76% 85%, rgba(137,220,235,.12), transparent 27%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-ktym4a .slidev-has-title::before {
+  inset: 6% 5% auto auto; width: 72px; height: 72px; border-radius: 18px;
+  background: linear-gradient(135deg, #f5c2e7, #cba6f7 45%, #89dceb);
+  transform: rotate(8deg); box-shadow: 0 18px 35px rgba(0,0,0,.25);
+}
+.reveal.slidev-engine.slidev-theme-ktym4a .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); color: #89dceb; }
+
+/* Nord：北欧极夜、冰川带与低饱和层级。 */
+.reveal.slidev-engine.slidev-theme-nord .slide-surface {
+  background:
+    linear-gradient(160deg, transparent 70%, rgba(136,192,208,.12) 70% 82%, transparent 82%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-nord .slidev-has-title::before {
+  inset: auto 0 0 0; width: 100%; height: 8px;
+  background: linear-gradient(90deg, #88c0d0 0 25%, #81a1c1 25% 50%, #5e81ac 50% 75%, #b48ead 75%);
+}
+.reveal.slidev-engine.slidev-theme-nord .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+
+/* Scholarly：Beamer 学术页眉、校色横带与论文编号。 */
+.reveal.slidev-engine.slidev-theme-scholarly .slide-surface {
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--sd-primary) 7%, transparent) 0 9%, transparent 9%),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-scholarly .slidev-has-title::before {
+  inset: 0 0 auto 0; width: 100%; height: 12px; background: var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-scholarly .slidev-has-title h1:first-child::before {
+  font-family: var(--sd-font);
+  letter-spacing: 0.04em;
+}
+.reveal.slidev-engine.slidev-theme-scholarly .slide-surface::after { bottom: 3.2%; color: var(--sd-primary); }
+
+/* Field Manual：复古纸张、军用网格、印章与打字机。 */
+.reveal.slidev-engine.slidev-theme-field-manual .slide-surface {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(37,41,30,.075) 24px),
+    repeating-linear-gradient(90deg, transparent 0 47px, rgba(37,41,30,.045) 48px),
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-field-manual .slidev-has-title::before {
+  inset: 4% 4% auto auto; width: 92px; height: 42px; border: 3px double var(--sd-primary);
+  background: transparent; transform: rotate(3deg);
+}
+.reveal.slidev-engine.slidev-theme-field-manual .slidev-has-title h1:first-child {
+  text-transform: uppercase; letter-spacing: .025em;
+}
+.reveal.slidev-engine.slidev-theme-field-manual .slidev-has-title h1:first-child::before { content: var(--sd-deck-title, none); }
+.reveal.slidev-engine.slidev-theme-field-manual :is(pre, blockquote, .chart-card) { border-radius: 0; box-shadow: 4px 4px 0 rgba(37,41,30,.12); }
+
+/* Touying：Typst 风格的结构化页眉与章节进度线。 */
+.reveal.slidev-engine.slidev-theme-touying .slide-surface {
+  background:
+    linear-gradient(0deg, var(--sd-primary) 0 2px, transparent 2px) 0 7% / 100% 100% no-repeat,
+    var(--sd-bg);
+}
+.reveal.slidev-engine.slidev-theme-touying .slidev-has-title::before {
+  inset: 0 auto 0 0; width: 4px; background: var(--sd-primary);
+}
+.reveal.slidev-engine.slidev-theme-touying .slidev-has-title h1:first-child::before {
+  font-family: var(--sd-font);
+  letter-spacing: 0.05em;
+}
+.reveal.slidev-engine.slidev-theme-touying .slidev-cols { gap: 2.2em; }

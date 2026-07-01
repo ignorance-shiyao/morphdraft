@@ -1,0 +1,1129 @@
+* { box-sizing: border-box; }
+:root {
+  --app-primary-color: #0ea5e9;
+  --app-bg: #ffffff;
+  --app-fg: #0f172a;
+  --app-muted: #64748b;
+  --app-border: #e2e8f0;
+  --app-code-bg: #f1f5f9;
+  --app-panel-bg: #f8fafc;
+  --app-soft-bg: #f8fafc;
+  --app-edge: rgba(255,255,255,0.5);
+  --app-shell-bg: #f6f8fb;
+  --app-elevated: #ffffff;
+  --app-control-bg: color-mix(in srgb, var(--app-elevated) 88%, var(--app-shell-bg));
+  --app-control-border: color-mix(in srgb, var(--app-border) 72%, transparent);
+  --app-menu-bg: color-mix(in srgb, var(--app-elevated) 96%, var(--app-shell-bg));
+  --app-hover: color-mix(in srgb, var(--app-primary-color) 9%, transparent);
+  --app-active: color-mix(in srgb, var(--app-primary-color) 15%, transparent);
+  --app-ring: color-mix(in srgb, var(--app-primary-color) 32%, transparent);
+  --app-selected-ring: 0 0 0 2px color-mix(in srgb, var(--app-primary-color) 28%, transparent);
+  --app-fg-soft: #475569;
+  --app-hairline: color-mix(in srgb, var(--app-border) 60%, transparent);
+  --editor-scrollbar-size: 10px;
+  --editor-scrollbar-track: color-mix(in srgb, var(--app-shell-bg) 82%, var(--app-elevated));
+  --editor-scrollbar-thumb: color-mix(in srgb, var(--app-muted) 30%, transparent);
+  --editor-scrollbar-thumb-hover: color-mix(in srgb, var(--app-primary-color) 45%, var(--app-muted));
+}
+html, body, #app { height: 100%; margin: 0; }
+body {
+  font-family: var(--font-family);
+  color: var(--app-fg);
+  background: var(--app-shell-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: var(--app-fg);
+}
+
+.toolbar {
+  position: relative;
+  z-index: var(--z-toolbar-menu);
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--app-hairline);
+  background: color-mix(in srgb, var(--app-shell-bg) 92%, var(--app-elevated));
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 var(--app-edge) inset, 0 1px 12px -8px rgba(15, 23, 42, 0.4);
+}
+.toolbar .brand {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-width: max-content;
+}
+.toolbar .spacer { flex: 1; }
+
+.workspace {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--app-shell-bg);
+}
+
+/* 分隔条上的「同步滚动」药丸 */
+.workbench {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  background: var(--app-shell-bg);
+  /* 固定的共用顶栏（横跨源码+预览）会写入 --pinned-bar-h，预留等高顶部占位，顶栏不遮挡正文 */
+  padding-top: var(--pinned-bar-h, 0);
+}
+
+.editor-handle { overflow: visible; display: flex; align-items: center; justify-content: center; }
+/* 分隔条上的「同步滚动」药丸 */
+.sync-pill {
+  position: relative;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 1px solid var(--app-hairline);
+  background: var(--app-elevated);
+  color: var(--app-muted);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: color .14s ease, border-color .14s ease, background .14s ease;
+}
+.sync-pill:hover {
+  color: var(--app-primary-color);
+  border-color: color-mix(in srgb, var(--app-primary-color) 40%, var(--app-border));
+}
+.sync-pill.on {
+  color: var(--app-primary-color);
+  border-color: color-mix(in srgb, var(--app-primary-color) 45%, var(--app-border));
+  background: color-mix(in srgb, var(--app-primary-color) 8%, var(--app-elevated));
+}
+
+/* ===== 统一的折叠/展开「边缘把手」：带区域名称的药丸标签，点击展开。 ===== */
+/* 停靠到被折叠面板原来的那条边：左右布局收左右缘，上下布局收上下缘。 */
+.edge-rail {
+  position: absolute;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: var(--app-shell-bg);
+  cursor: pointer;
+}
+/* 药丸标签（与侧栏 .rail-label 共用样式，见下方统一定义） */
+/* 左右停靠 → 竖排标签 */
+.edge-rail.dock-left,
+.edge-rail.dock-right { top: 0; bottom: 0; width: 22px; }
+.edge-rail.dock-left { left: 0; border-right: 1px solid var(--app-hairline); }
+.edge-rail.dock-right { right: 0; border-left: 1px solid var(--app-hairline); }
+/* 上下停靠 → 横排标签 */
+.edge-rail.dock-top,
+.edge-rail.dock-bottom { left: 0; right: 0; height: 22px; }
+.edge-rail.dock-top { top: 0; border-bottom: 1px solid var(--app-hairline); }
+.edge-rail.dock-bottom { bottom: 0; border-top: 1px solid var(--app-hairline); }
+
+/* 药丸标签：圆角胶囊 + 区域名称，hover 变主色。竖排/横排由停靠方向决定。 */
+.rail-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--app-muted);
+  background: color-mix(in srgb, var(--app-border) 30%, transparent);
+  border-radius: 999px;
+  transition: color .14s ease, background .14s ease, box-shadow .14s ease;
+}
+.dock-left .rail-label,
+.dock-right .rail-label,
+.sidebar .rail-label { writing-mode: vertical-rl; padding: 11px 3px; }
+.dock-top .rail-label,
+.dock-bottom .rail-label { padding: 3px 13px; }
+.edge-rail:hover .rail-label,
+.expand:hover .rail-label {
+  color: var(--app-primary-color);
+  background: color-mix(in srgb, var(--app-primary-color) 14%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-primary-color) 10%, transparent);
+}
+
+.workspace.snap-sidebar .sidebar,
+.workspace.snap-source .editor,
+.workspace.snap-preview .paper-preview,
+.workspace.snap-preview .slide-pane {
+  transition:
+    width 220ms cubic-bezier(.2, 1.12, .22, 1),
+    min-width 220ms cubic-bezier(.2, 1.12, .22, 1),
+    flex-basis 220ms cubic-bezier(.2, 1.12, .22, 1),
+    transform 220ms cubic-bezier(.2, 1.12, .22, 1);
+}
+.workspace.snap-sidebar .sidebar,
+.workspace.snap-source .editor,
+.workspace.snap-preview .paper-preview,
+.workspace.snap-preview .slide-pane {
+  animation: snap-edge 220ms cubic-bezier(.2, 1.12, .22, 1);
+}
+.workspace.snap-sidebar .sidebar-handle::after,
+.workspace.snap-source .editor-handle::after,
+.workspace.snap-preview .editor-handle::after {
+  background: var(--app-primary-color);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--app-primary-color) 14%, transparent);
+}
+@keyframes snap-edge {
+  0% { transform: translateZ(0) scale(1); }
+  52% { transform: translateZ(0) scale(0.992); }
+  100% { transform: translateZ(0) scale(1); }
+}
+
+/* 统一的滑块样式（缩放/缩略图等），与设计系统一致 */
+input[type="range"].ui-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  height: 16px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"].ui-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--app-fg) 16%, var(--app-bg));
+}
+input[type="range"].ui-range::-moz-range-track {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--app-fg) 16%, var(--app-bg));
+}
+input[type="range"].ui-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--app-primary-color);
+  border: 2px solid var(--app-elevated);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease;
+}
+input[type="range"].ui-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--app-primary-color);
+  border: 2px solid var(--app-elevated);
+  box-shadow: var(--shadow-sm);
+}
+input[type="range"].ui-range:hover::-webkit-slider-thumb { transform: scale(1.12); }
+input[type="range"].ui-range:focus-visible { outline: none; }
+input[type="range"].ui-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--app-ring); }
+.ppt-wrapper {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.pane { flex: 1 1 auto; min-width: 0; overflow: auto; background: var(--app-bg); }
+.pane.editor {
+  background: color-mix(in srgb, var(--app-bg) 96%, var(--app-panel-bg));
+}
+
+.resize-handle {
+  flex: 0 0 10px;
+  width: 10px;
+  min-width: 10px;
+  padding: 0;
+  border: 0;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  z-index: 8;
+}
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 72px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-border) 82%, transparent);
+  transition: background 0.14s ease, box-shadow 0.14s ease;
+}
+.resize-handle.sidebar-handle {
+  flex-basis: 14px;
+  width: 14px;
+  min-width: 14px;
+  z-index: 11;
+}
+.resize-handle:hover::after,
+body.resizing-columns .resize-handle::after,
+body.resizing-rows .resize-handle::after,
+.resize-handle.active::after {
+  background: var(--app-primary-color);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--app-primary-color) 12%, transparent),
+    0 0 16px color-mix(in srgb, var(--app-primary-color) 28%, transparent);
+}
+body.resizing-columns .resize-handle.editor-handle::after,
+body.resizing-rows .resize-handle.editor-handle::after,
+.resize-handle.editor-handle.active::after {
+  width: 2px;
+  height: min(100%, 480px);
+}
+body.resizing-rows .resize-handle.editor-handle::after,
+.resize-handle.editor-handle.active::after {
+  width: min(100%, 480px);
+  height: 2px;
+}
+.pane-resize-indicator {
+  position: fixed;
+  z-index: 1200;
+  top: calc(var(--toolbar-height, 48px) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--app-primary-color);
+  background: color-mix(in srgb, var(--app-menu-bg) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-primary-color) 28%, var(--app-border));
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+  animation: pane-resize-in 180ms ease-out;
+}
+.pane-resize-indicator.fading {
+  animation: pane-resize-out 300ms cubic-bezier(.4, 0, .2, 1) forwards;
+}
+@keyframes pane-resize-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes pane-resize-out {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+body.resizing-columns {
+  cursor: col-resize;
+  user-select: none;
+}
+body.resizing-rows {
+  cursor: row-resize;
+  user-select: none;
+}
+body.resizing-thumbs {
+  cursor: row-resize;
+  user-select: none;
+}
+
+/* 垂直分屏 */
+.workbench.orient-vertical {
+  flex-direction: column;
+}
+.workbench.orient-vertical > .resize-handle {
+  flex: 0 0 10px;
+  width: 100%;
+  height: 10px;
+  min-width: unset;
+  min-height: 10px;
+  cursor: row-resize;
+  background: transparent;
+}
+.workbench.orient-vertical > .resize-handle::after {
+  width: 72px;
+  height: 4px;
+}
+body.resizing-rows .resize-handle::after {
+  background: var(--app-primary-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--app-primary-color) 12%, transparent);
+}
+
+/* CodeMirror 占满 */
+.editor .cm-editor { height: 100%; }
+.editor .cm-scroller {
+  font-family: var(--font-family-mono);
+  font-size: 14px;
+  line-height: 1.65;
+  scrollbar-width: thin;
+  scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
+}
+.editor .cm-scroller::-webkit-scrollbar {
+  width: var(--editor-scrollbar-size);
+  height: var(--editor-scrollbar-size);
+}
+.editor .cm-scroller::-webkit-scrollbar-track {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 2px,
+      var(--editor-scrollbar-track) 2px,
+      var(--editor-scrollbar-track) calc(100% - 2px),
+      transparent calc(100% - 2px)
+    );
+}
+.editor .cm-scroller::-webkit-scrollbar-track:horizontal {
+  background:
+    linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2px,
+      var(--editor-scrollbar-track) 2px,
+      var(--editor-scrollbar-track) calc(100% - 2px),
+      transparent calc(100% - 2px)
+    );
+}
+.editor .cm-scroller::-webkit-scrollbar-thumb {
+  min-height: 42px;
+  min-width: 42px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--editor-scrollbar-thumb);
+  background-clip: padding-box;
+}
+.editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--editor-scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+.editor .cm-scroller::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 文档预览排版 */
+.doc-preview {
+  padding: 42px 56px;
+  line-height: 1.72;
+  max-width: 920px;
+  margin: 0 auto;
+  color: var(--fg);
+  letter-spacing: -0.005em;
+}
+.doc-preview h1, .doc-preview h2, .doc-preview h3,
+.doc-preview h4, .doc-preview h5, .doc-preview h6 {
+  font-weight: var(--heading-weight);
+  font-family: var(--heading-family);
+  color: color-mix(in srgb, var(--fg) 92%, var(--primary-color));
+}
+.doc-preview p { margin: 0.72em 0; }
+/* —— 编辑式标题层级（对齐 MorphDraft 参考图）：大号黑体 h1、克制的 h2/h3 —— */
+.doc-preview h1 {
+  font-size: 2.05em;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+  margin: 1.15em 0 0.68em;
+  text-align: left;
+}
+/* h1 紧跟的首段当作副标题：更大、偏灰、轻量 */
+.doc-preview h1 + p {
+  margin-top: -0.16em;
+  font-size: 1.08em;
+  font-weight: 500;
+  line-height: 1.62;
+  color: color-mix(in srgb, var(--fg) 66%, var(--muted));
+}
+.doc-preview h2 {
+  position: relative;
+  font-size: 1.34em;
+  font-weight: 760;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+  margin: 1.72em 0 0.72em;
+  padding-bottom: 0.34em;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+.doc-preview h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 44px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary-color);
+}
+.doc-preview h3 {
+  font-size: 1.13em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 1.35em 0 0.5em;
+}
+.doc-preview h4 { font-size: 1.02em; font-weight: 700; margin: 1.1em 0 0.4em; color: color-mix(in srgb, var(--primary-color) 82%, var(--fg)); }
+.doc-preview h5,
+.doc-preview h6 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1.2em 0 0.45em;
+  font-size: 0.9em;
+  font-weight: 760;
+  color: color-mix(in srgb, var(--primary-color) 76%, var(--fg));
+  text-transform: none;
+}
+.doc-preview a {
+  color: var(--primary-color);
+  text-decoration-color: color-mix(in srgb, var(--primary-color) 40%, transparent);
+  text-underline-offset: 3px;
+}
+.doc-preview a:hover {
+  text-decoration-color: var(--primary-color);
+}
+.doc-preview hr {
+  height: 1px;
+  margin: 2.2em 0;
+  border: 0;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--primary-color) 36%, transparent) 18%,
+      color-mix(in srgb, var(--primary-color) 72%, var(--border)) 50%,
+      color-mix(in srgb, var(--primary-color) 36%, transparent) 82%,
+      transparent
+    );
+}
+/* ===== M1 编辑可发现性：给「可点编辑」暗示，纯 CSS 不改逻辑 ===== */
+/* 普通链接（wikilink / 自动目录链接排除）：常驻浮出编辑铅笔，点链接即开链接编辑弹层 */
+.doc-preview a:not(.wikilink):not(.toc a) { cursor: text; }
+.doc-preview a:not(.wikilink):not(.toc a)::after {
+  content: '';
+  display: inline-block;
+  width: 0.86em;
+  height: 0.86em;
+  margin-left: 4px;
+  opacity: 0.72;
+  cursor: pointer;
+  vertical-align: -0.1em;
+  background: var(--primary-color);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-4 9.9-9.9 2 2L8 18H6v-2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M4 20h4.8L19.4 9.4a2.1 2.1 0 0 0 0-3L17.6 4.6a2.1 2.1 0 0 0-3 0L4 15.2V20Zm2-4 9.9-9.9 2 2L8 18H6v-2Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.doc-preview a:not(.wikilink):not(.toc a):hover::after { opacity: 1; }
+/* 行内标签 / 进度条 / 图标：hover 主色细环 + 指针，暗示可原地编辑 */
+.doc-preview :is(.pill, .ui-bar) {
+  cursor: pointer;
+  transition: box-shadow 0.12s ease;
+}
+.doc-preview :is(.pill, .ui-bar):hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 32%, transparent);
+}
+.doc-preview .md-icon {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: outline-color 0.12s ease;
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+}
+.doc-preview .md-icon:hover {
+  outline-color: color-mix(in srgb, var(--primary-color) 32%, transparent);
+}
+/* 行内代码：与上面 chip 一致给指针暗示（点击进行内/源码编辑） */
+.doc-preview code:not(pre code):hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 24%, transparent);
+}
+/* 行内代码：主题色淡底 + 主题色深字，所有主题下都跳得出来 */
+.doc-preview code {
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--code-bg));
+  color: color-mix(in srgb, var(--primary-color) 85%, var(--fg));
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 0.88em;
+    font-family: var(--font-family-mono);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+.doc-preview pre {
+  position: relative;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 4%, transparent), transparent 48%),
+    var(--code-bg);
+    padding: 32px 14px 14px 0;
+  border-radius: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  border: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 42%, transparent) inset,
+    0 16px 42px -34px color-mix(in srgb, var(--fg) 38%, transparent);
+}
+/* 实时预览代码块「复制」按钮：hover 显现于右下角（避开右上角语言徽标） */
+.doc-preview pre > .md-code-copy {
+  position: absolute; right: 8px; bottom: 8px; z-index: 3;
+  height: 24px; padding: 0 10px;
+  font: 650 11px/1 var(--font-family);
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--panel-bg) 90%, var(--code-bg));
+  color: var(--fg);
+  cursor: pointer; opacity: 0;
+  transition: opacity .12s ease, border-color .12s ease;
+}
+.doc-preview pre:hover > .md-code-copy { opacity: 1; }
+.doc-preview pre > .md-code-copy:hover { border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border)); }
+.doc-preview pre > .md-code-copy.copied { color: #16a34a; border-color: color-mix(in srgb, #16a34a 40%, var(--border)); opacity: 1; }
+.doc-preview pre .code-lang {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 1px 7px;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 18%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary-color) 7%, var(--panel-bg));
+  color: color-mix(in srgb, var(--primary-color) 78%, var(--fg));
+    font: 600 11px/1.2 var(--font-family-mono);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.doc-preview pre .code-lang:hover,
+.doc-preview pre .code-lang:focus-visible {
+    border-color: color-mix(in srgb, var(--primary-color) 48%, var(--border));
+    background: color-mix(in srgb, var(--primary-color) 12%, var(--panel-bg));
+    outline: none;
+}
+.doc-preview pre code {
+  display: block;
+  background: none;
+  padding: 0;
+  border: 0;
+  color: var(--fg);
+  font-size: 0.88em;
+    font-family: var(--font-family-mono);
+    line-height: var(--paper-line-height);
+}
+.doc-preview pre code .code-line {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+    column-gap: 9px;
+    padding-right: 12px;
+    line-height: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.doc-preview pre code .code-lineno {
+  padding-right: 10px;
+  text-align: right;
+  color: color-mix(in srgb, var(--muted) 62%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
+  user-select: none;
+}
+.doc-preview pre code .code-text {
+  min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.doc-preview pre code .code-line.hl {
+  background: color-mix(in srgb, var(--primary-color) 11%, transparent);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--primary-color) 72%, transparent);
+}
+/* 纯代码块「DOM 级真原地编辑」：把 <code> 内容换成「行号 gutter + 可编辑高亮代码」，沿用代码块的版式
+   （44px 行号列 + 代码列），编辑就在原位、不弹浮层；细主题色描边表示正在编辑。 */
+.doc-preview pre.code-inplace-editing {
+  outline: 2px solid color-mix(in srgb, var(--primary-color) 38%, transparent);
+  outline-offset: 1px;
+}
+.doc-preview pre.code-inplace-editing > code {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 9px;
+  padding-right: 12px;
+}
+.doc-preview pre.code-inplace-editing .ci-gutter {
+  overflow: hidden;
+  text-align: right;
+  padding-right: 10px;
+  line-height: inherit;
+  color: color-mix(in srgb, var(--muted) 68%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
+  user-select: none;
+}
+.doc-preview pre.code-inplace-editing .ci-code {
+  min-width: 0;
+  /* 超长代码软换行（与渲染态代码块一致），不再横向滚动 */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  outline: none;
+  caret-color: var(--primary-color);
+}
+/* 软换行后，逻辑行可能占多行视觉行；行号格高度由 JS 按实测行高同步，数字顶对齐 */
+.doc-preview pre.code-inplace-editing .ci-gutter > div {
+  display: flex;
+  justify-content: flex-end;
+}
+/* 引用：克制的主题色细竖条 + 无底色，文字略大、偏稳重（贴近参考图的引言感） */
+/* 列表标记：主色化（参考录屏的彩色项目符号/序号）。仅作用于真有标记的内容列表——
+   任务清单与 timeline/steps/kpi 等容器都是 list-style:none、无 marker，天然不受影响。 */
+.doc-preview li::marker { color: color-mix(in srgb, var(--primary-color) 82%, var(--fg)); }
+.doc-preview ol > li::marker { font-weight: 700; font-variant-numeric: tabular-nums; }
+.doc-preview ul,
+.doc-preview ol { padding-left: 1.35em; }
+.doc-preview ul > li { margin: 0.24em 0; }
+.doc-preview ol > li { margin: 0.24em 0; }
+.doc-preview .task-list {
+  list-style: none;
+  padding-left: 2px;
+}
+.doc-preview .task-list .task-item {
+  list-style: none;
+  line-height: inherit;
+}
+.doc-preview .task-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  margin: 0 9px 0 0;
+  vertical-align: text-bottom;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, var(--primary-color));
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--panel-bg) 92%, var(--bg));
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.doc-preview .task-checkbox::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: 1.8px solid #fff;
+  border-left: 0;
+  border-top: 0;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.82);
+  transform-origin: center;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.doc-preview .task-checkbox:checked {
+  border-color: color-mix(in srgb, var(--primary-color) 88%, var(--fg));
+  background-color: var(--primary-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+.doc-preview .task-checkbox:checked::after {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+.doc-preview .task-checkbox:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 76%, var(--border));
+}
+.doc-preview .task-checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+.doc-preview blockquote {
+  margin: 1.2em 0;
+  padding: 0.88em 1em 0.88em 1.15em;
+  border-left: 3px solid color-mix(in srgb, var(--primary-color) 70%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary-color) 7%, transparent), transparent 88%);
+  border-radius: 0 10px 10px 0;
+  font-size: 1.04em;
+  line-height: max(var(--paper-line-height), 2);
+  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
+}
+.doc-preview blockquote p {
+  margin: 0.42em 0;
+  line-height: inherit;
+}
+.doc-preview blockquote > :first-child { margin-top: 0; }
+.doc-preview blockquote > :last-child { margin-bottom: 0; }
+/* 高亮 ==text==：主题色淡底 + 主题色字 */
+.doc-preview mark {
+  background: color-mix(in srgb, #facc15 36%, transparent);
+  color: color-mix(in srgb, var(--fg) 90%, #854d0e);
+  padding: 0 4px;
+  border-radius: 5px;
+}
+/* 下划线 <u> / 插入 <ins> */
+.doc-preview u, .doc-preview ins {
+  text-decoration-color: color-mix(in srgb, var(--primary-color) 60%, var(--fg));
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+/* 上下标 */
+.doc-preview sup, .doc-preview sub {
+  color: color-mix(in srgb, var(--primary-color) 70%, var(--fg));
+  font-weight: 600;
+}
+/* 键位 kbd：Markdown 预览、Help、演示帮助共用 */
+.md-kbd,
+.doc-preview kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-size: 0.82em;
+  font-family: var(--font-family-mono);
+  color: var(--fg, var(--app-fg));
+  background: var(--panel-bg, var(--app-panel-bg));
+  border: 1px solid color-mix(in srgb, var(--border, var(--app-border)) 80%, transparent);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.doc-preview table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  overflow: hidden;
+  margin: 1em 0 1.35em;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 14px 32px -30px color-mix(in srgb, var(--fg) 42%, transparent);
+}
+.doc-preview th, .doc-preview td {
+  border: 0;
+  border-right: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  padding: 10px 14px;
+  vertical-align: top;
+}
+.doc-preview tr > :last-child { border-right: 0; }
+.doc-preview tbody tr:last-child > * { border-bottom: 0; }
+.doc-preview th {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 8%, var(--panel-bg)), color-mix(in srgb, var(--panel-bg) 88%, var(--bg)));
+  font-weight: 760;
+  color: color-mix(in srgb, var(--fg) 86%, var(--primary-color));
+}
+.doc-preview tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--primary-color) 2.8%, transparent);
+}
+.doc-preview tbody tr:hover {
+  background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+}
+.doc-preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, transparent);
+  box-shadow: 0 18px 42px -28px color-mix(in srgb, var(--fg) 46%, transparent);
+}
+.doc-preview figure { margin: 16px 0; text-align: center; }
+.doc-preview figure img { display: inline-block; }
+.doc-preview figcaption {
+  margin-top: 8px; font-size: 0.88em; color: var(--muted);
+  line-height: 1.5;
+}
+
+/* 双向定位：当前块高亮 */
+.doc-preview [data-source-line] { scroll-margin-top: 20px; }
+/* 源码空白行 1:1 占位：每条占一整行高（随正文行距） */
+.doc-preview .md-blank-line {
+  height: 1.5em;
+  height: 1lh;
+  margin: 0;
+  user-select: text;
+  cursor: text;
+  /* 可点击进入编辑、可被选区穿过（不再 pointer-events:none / 不再空 div） */
+}
+.doc-preview blockquote.md-empty-quote-line {
+  min-height: 2.4em;
+  user-select: text;
+  cursor: text;
+}
+.doc-preview .src-active {
+  background: color-mix(in srgb, var(--primary-color) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--primary-color);
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+/* 图表基础尺寸供页面与 PPT 共用，保持既有渲染行为。 */
+.chart-block { margin: 16px 0; }
+.chart-block svg { display: block; max-width: 100%; height: auto; margin: auto; }
+.chart-block[data-chart-type='mermaid'] {
+  display: grid;
+  place-items: center;
+}
+.chart-block[data-chart-type='mermaid']:not(.chart-ready) { min-height: 240px; }
+.chart-block[data-chart-type='mermaid'] svg { max-height: 100%; }
+.chart-block[data-chart-type='echarts'] { height: 360px; }
+.chart-block[data-chart-type='mermaid'].mermaid-inspectable {
+  position: relative;
+  overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.mermaid-viewport {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  touch-action: none;
+  cursor: default;
+}
+.is-mermaid-transformed .mermaid-viewport { cursor: grab; }
+.mermaid-viewport.is-panning { cursor: grabbing; }
+.mermaid-viewport > svg {
+  transform-origin: center center;
+  transition: transform 120ms ease;
+}
+.mermaid-viewport.is-panning > svg { transition: none; }
+.mermaid-tools {
+  position: relative;
+  z-index: 1;
+  justify-self: end;
+  order: -1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(8px);
+  opacity: 0.72;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.mermaid-inspectable:hover > .mermaid-tools,
+.mermaid-tools:focus-within,
+.is-mermaid-transformed > .mermaid-tools {
+  opacity: 1;
+}
+.mermaid-tool-btn {
+  min-width: 26px;
+  height: 25px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg);
+  font: 700 10px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.mermaid-tool-btn:hover,
+.mermaid-tool-btn:focus-visible {
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  outline: none;
+}
+.slide-stage.is-presenting .mermaid-tools,
+.present-overlay .mermaid-tools,
+.mini-surface .mermaid-tools {
+  display: none !important;
+}
+
+/* 页面预览图表卡片：标题和图表作为一个分页块，不改变 PPT / 导出布局。 */
+.doc-preview .chart-card {
+  position: relative;
+  margin: 20px 0;
+  overflow: hidden;
+  border: 1px solid var(--preview-card-border);
+  border-radius: 12px;
+  background: var(--preview-card-bg);
+  box-shadow: var(--preview-card-shadow);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.doc-preview .chart-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--preview-card-border);
+  background: var(--preview-card-title-bg);
+  color: var(--preview-card-title-fg);
+}
+.doc-preview .chart-card-editing > .chart-card-title {
+  visibility: hidden;
+}
+.doc-preview .chart-card-title > h3 {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--heading-family);
+  font-size: 0.98em;
+  font-weight: 750;
+  line-height: 1.35;
+}
+/* 类型徽标：浮在卡片右上角（标题已移出卡片，徽标不再随标题栏排布） */
+.doc-preview .chart-card-type {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 1;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 20%, var(--border));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary-color) 7%, var(--bg));
+  color: color-mix(in srgb, var(--primary-color) 76%, var(--fg));
+  font: 650 10px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.025em;
+}
+.doc-preview .chart-card-body {
+  padding: 16px 18px 18px;
+}
+.doc-preview .chart-card .chart-block {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.doc-preview .chart-block svg { display: block; max-width: 100%; height: auto; margin: auto; }
+/* 纵向超高的 mermaid 图（状态图/ER/类图/纵向流程图）按视口高度收住，meet 保持比例不变形 */
+.doc-preview .chart-block[data-chart-type='mermaid'] svg { max-height: 70vh; }
+.doc-preview .chart-block[data-chart-type='echarts'] {
+  height: 360px;
+  min-height: 360px;
+}
+.chart-error {
+  color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca;
+  padding: 10px 12px; border-radius: 8px; white-space: pre-wrap;
+}
+
+/* 容器 :::note / :::card */
+.callout { margin: 18px 0; padding: 16px 18px; border-radius: 12px; }
+.callout > :first-child { margin-top: 0; }
+.callout > :last-child { margin-bottom: 0; }
+.callout-note { background: color-mix(in srgb, var(--primary-color) 7%, transparent);
+  border-left: 4px solid var(--primary-color); border-radius: 0 12px 12px 0; }
+.callout-card {
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.15);
+}
+
+/* 参考稿中的轻量语义提示条；高 specificity 覆盖运行时注入的通用 ALERT_CSS。 */
+.doc-preview .alert,
+.doc-preview .callout:not(.callout-card) {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--alert-color, var(--primary-color)) 24%, var(--border));
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--alert-color, var(--primary-color)) 6%, var(--bg));
+  box-shadow: none;
+}
+.doc-preview .alert-title {
+  gap: 6px;
+  margin-bottom: 3px;
+  font-size: 0.9em;
+}
+.doc-preview .alert p,
+.doc-preview .callout:not(.callout-card) p {
+  margin: 3px 0;
+}
+
+/* 数学公式（KaTeX） */
+.math-block { text-align: center; overflow-x: auto; overflow-y: hidden; margin: 12px 0; }
+.katex-error { color: #e5484d; background: color-mix(in srgb, #e5484d 10%, transparent);
+  padding: 1px 4px; border-radius: 4px; font-family: var(--font-family-mono); }
+
+/* 多栏布局 :::cols / :::col（直接子元素一律等宽，便于 :::cols 内直接放 :::panel/:::card） */
+.cols {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.cols > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* M3-2: WikiLink 双链 */
+.wikilink {
+  color: var(--primary-color);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--primary-color);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.wikilink:hover { opacity: 0.8; text-decoration-style: solid; }
+
+/* M2-7: 中西文混排空隙（CJK↔Latin/数字边界自动加细空隙） */
+.doc-preview, .slide-surface, .cm-content {
+  word-break: break-word;
+}
+
+/* CSS text-autospace：主力方案（Chromium 120+ / Firefox behind flag） */
+.doc-preview p, .doc-preview li, .doc-preview th, .doc-preview td,
+.doc-preview h1, .doc-preview h2, .doc-preview h3, .doc-preview h4,
+.doc-preview h5, .doc-preview h6, .doc-preview blockquote, .doc-preview figcaption,
+.slide-surface, .cm-content {
+  -webkit-text-autospace: ideograph-alpha ideograph-numeric;
+  text-autospace: ideograph-alpha ideograph-numeric;
+}
+
+/* JS fallback：text-autospace 不支持时，cjk-spacing 插件插入的 span 显示 */
+.cjk-space {
+  display: none;
+}
+/* 仅在 text-autospace 不生效的浏览器中显示 fallback span（@supports 反向探测） */
+@supports not ((-webkit-text-autospace: ideograph-alpha) or (text-autospace: ideograph-alpha)) {
+  .cjk-space {
+    display: inline;
+    width: 0.25em;
+  }
+}
+
+@media (max-width: 980px) {
+  .toolbar { gap: 8px; padding: 8px 10px; }
+  .toolbar .brand { font-size: 15px; }
+  .workbench { flex-direction: column; }
+  .pane.editor { border-right: 0; border-bottom: 1px solid var(--app-border); }
+  .doc-preview { padding: 28px 24px; }
+  .resize-handle { display: none; }
+}
+.file-drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 20);
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: color-mix(in srgb, var(--app-shell-bg) 76%, transparent);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+.file-drop-overlay .file-drop-card {
+  pointer-events: none;
+}
+.file-drop-card {
+  width: min(520px, 100%);
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 32px;
+  border: 2px dashed color-mix(in srgb, var(--app-primary-color) 65%, var(--app-border));
+  border-radius: var(--radius-2xl);
+  color: var(--app-fg);
+  background: color-mix(in srgb, var(--app-elevated) 94%, transparent);
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+}
+.file-drop-card > svg { color: var(--app-primary-color); }
+.file-drop-card strong { font-size: 22px; }
+.file-drop-card span { max-width: 44ch; color: var(--app-muted); line-height: 1.6; }

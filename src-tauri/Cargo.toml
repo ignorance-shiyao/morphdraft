@@ -1,0 +1,19 @@
+[package]
+name = "morphdraft"
+version = "0.1.0-beta"
+description = "墨形 MorphDraft - Markdown 文档与幻灯片编辑器"
+authors = ["ignorance"]
+edition = "2021"
+
+[lib]
+name = "morphdraft_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-shell = "2"

@@ -1,0 +1,94 @@
+/* ============================================================
+ * 设计 token 三层：
+ *  1) 尺度层（本文件 :root）—— 间距/圆角/阴影/字号/过渡，与换肤无关，全局统一刻度。
+ *  2) 语义层 —— themes/apply.ts 动态写入的 --app-*（外壳）与 --*（内容），随主题切换。
+ *  3) 组件层 —— 各组件内部 var，引用上面两层，便于局部微调。
+ * ============================================================ */
+:root {
+  /* —— 内容主题默认值（apply.ts 会覆盖）—— */
+  --primary-color: #2563eb;
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --code-bg: #f6f8fa;
+  --panel-bg: #fafafa;
+  --font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --heading-family: var(--font-family);
+    --theme-font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    --theme-heading-family: var(--theme-font-family);
+    --theme-font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --heading-weight: 700;
+
+  /* —— 页面预览组件变量（由内容主题变量自动派生）—— */
+  --preview-card-bg:
+    linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 2.5%, transparent), transparent 34%),
+    color-mix(in srgb, var(--panel-bg) 46%, var(--bg));
+  --preview-card-border: color-mix(in srgb, var(--border) 82%, transparent);
+  --preview-card-shadow: 0 12px 32px -28px color-mix(in srgb, var(--primary-color) 40%, transparent);
+  --preview-card-title-bg: color-mix(in srgb, var(--primary-color) 5%, var(--panel-bg));
+  --preview-card-title-fg: color-mix(in srgb, var(--primary-color) 72%, var(--fg));
+  --preview-editor-bg: color-mix(in srgb, var(--code-bg) 88%, var(--bg));
+  --preview-editor-border: color-mix(in srgb, var(--primary-color) 30%, var(--border));
+  --preview-editor-ring: color-mix(in srgb, var(--primary-color) 18%, transparent);
+  --preview-editor-shadow: 0 18px 42px -28px color-mix(in srgb, var(--primary-color) 55%, #0f172a);
+
+  /* —— 间距（4px 栅格）—— */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* —— 圆角 —— */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* —— 阴影（柔和、低饱和，贴近「纸感」）—— */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+  --shadow-paper: 0 8px 30px rgba(15, 23, 42, 0.10);
+
+  /* —— 字号 —— */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.6;
+  --line-height-loose: 1.85;
+
+    --font-family-mono: var(--theme-font-family-mono);
+
+  /* —— 过渡 —— */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* —— 层级 —— */
+  --z-header: 100;
+  --z-dropdown: 1000;
+  --z-toolbar-menu: 1100;
+  --z-modal: 1200;
+  --z-toast: 1300;
+}

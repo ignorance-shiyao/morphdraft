@@ -1,0 +1,920 @@
+/* 幻灯片皮肤招牌装饰（POC）。仅在 .reveal.skin-<id> 子树生效 → 天然只作用于 PPT 预览，不污染文档。
+   颜色变量由 JS 注入到 .reveal 根（见 skins.ts/skinCssVars），此处只写「装饰」。 */
+
+.reveal[class*="skin-"] .slide-surface::before {
+  display: none;
+}
+
+.reveal[class*="skin-"] .slide-surface {
+  --skin-soft-shadow: 0 18px 46px rgba(0, 0, 0, .12);
+  --skin-hairline: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.reveal[class*="skin-"] .slide-surface h1,
+.reveal[class*="skin-"] .slide-surface h2,
+.reveal[class*="skin-"] .slide-surface h3 {
+  text-wrap: balance;
+}
+
+.reveal[class*="skin-"] .slide-surface .slide-title {
+  border-left-width: 6px;
+}
+
+.reveal[class*="skin-"] .slide-surface .callout-card,
+.reveal[class*="skin-"] .slide-surface .callout-note,
+.reveal[class*="skin-"] .slide-surface pre,
+.reveal[class*="skin-"] .slide-surface table,
+.reveal[class*="skin-"] .slide-surface .chart-block {
+  border-color: var(--skin-hairline);
+}
+
+.reveal[class*="skin-"] .slide-surface pre code {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent);
+}
+
+.reveal[class*="skin-"] .slide-surface.slide-layout-cover h1::after {
+  width: 1.9em;
+}
+
+.reveal[class*="skin-"] .slide-surface.slide-layout-section h1,
+.reveal[class*="skin-"] .slide-surface.slide-layout-section h2 {
+  letter-spacing: 0;
+}
+
+/* ============ 毛玻璃 glass ============ */
+.reveal.skin-glass .slide-surface {
+  background:
+    radial-gradient(60% 60% at 20% 18%, rgba(125,211,252,.30), transparent 60%),
+    radial-gradient(50% 50% at 82% 30%, rgba(192,132,252,.28), transparent 60%),
+    radial-gradient(60% 60% at 60% 92%, rgba(240,171,252,.22), transparent 60%),
+    linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02) 45%, rgba(255,255,255,.06)),
+    #0b1024;
+}
+.reveal.skin-glass .slide-surface::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-glass .slide-surface table,
+.reveal.skin-glass .slide-surface .callout,
+.reveal.skin-glass .slide-surface pre,
+.reveal.skin-glass .slide-surface .chart-card,
+.reveal.skin-glass .slide-surface .chart-block {
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 16px;
+}
+
+/* ============ 硬核 neo-brutalism ============ */
+.reveal.skin-brutalism .slide-surface {
+  background:
+    #fffef0;
+  border: 3px solid #111;
+  box-shadow: none;
+}
+.reveal.skin-brutalism .slide-surface::before {
+  display: block;
+  height: 10px;
+  background: repeating-linear-gradient(45deg, #ffd400 0 14px, #111 14px 18px);
+}
+.reveal.skin-brutalism .slide-surface h1,
+.reveal.skin-brutalism .slide-surface h2 {
+  display: inline-block;
+  background: #ffd400; color: #000;
+  padding: .08em .34em;
+  border: 0;
+  box-shadow: inset 0 -4px 0 color-mix(in srgb, #000 16%, transparent);
+}
+.reveal.skin-brutalism .slide-surface table,
+.reveal.skin-brutalism .slide-surface .callout,
+.reveal.skin-brutalism .slide-surface .chart-card,
+.reveal.skin-brutalism .slide-surface pre {
+  border: 2px solid #111 !important;
+  box-shadow: none;
+  border-radius: 0;
+}
+.reveal.skin-brutalism .slide-surface blockquote {
+  border-left: 5px solid #111;
+  background: #fff38a;
+}
+
+.reveal.skin-brutalism .slide-surface .chart-card-title {
+    border-bottom: 2px solid #111;
+    background: #ffd400;
+}
+
+/* ============ 瑞士网格 swiss ============ */
+.reveal.skin-swiss .slide-surface {
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px) 0 0 / calc(100% / 12) 100%,
+    linear-gradient(0deg, rgba(0,0,0,.025) 1px, transparent 1px) 0 0 / 100% 72px,
+    #ffffff;
+}
+.reveal.skin-swiss .slide-surface::before {
+  display: block;
+  height: 8px; background: #d6001c; /* 瑞士红顶条 */
+}
+.reveal.skin-swiss .slide-surface h1,
+.reveal.skin-swiss .slide-surface h2 {
+  border-left: 8px solid #d6001c; padding-left: .35em; letter-spacing: -.02em;
+}
+.reveal.skin-swiss .slide-surface table th { background: #111; color: #fff; }
+.reveal.skin-swiss .slide-surface table,
+.reveal.skin-swiss .slide-surface th,
+.reveal.skin-swiss .slide-surface td { border-radius: 0; }
+
+/* ============ 国际蓝格 international-blue ============ */
+.reveal.skin-international-blue .slide-surface {
+  background:
+    linear-gradient(90deg, rgba(0,47,167,.10) 1px, transparent 1px) 0 0 / calc(100% / 16) 100%,
+    linear-gradient(0deg, rgba(10,10,10,.045) 1px, transparent 1px) 0 0 / 100% 64px,
+    #fafaf8;
+}
+.reveal.skin-international-blue .slide-surface::before {
+  content: "";
+  display: block;
+  height: 10px;
+  background: #002FA7;
+}
+.reveal.skin-international-blue .slide-surface::after {
+  content: "MORPHDRAFT / DECK";
+  position: absolute;
+  right: 6%;
+  bottom: 4.6%;
+  color: rgba(0,47,167,.82);
+  font-family: var(--font-family);
+  font-size: .44em;
+  font-weight: 800;
+  letter-spacing: .1em;
+  z-index: 0;
+}
+.reveal.skin-international-blue .slide-surface h1,
+.reveal.skin-international-blue .slide-surface h2 {
+  color: #002FA7;
+  letter-spacing: -.02em;
+}
+.reveal.skin-international-blue .slide-surface.slide-layout-cover {
+  background:
+    radial-gradient(circle at 85% 18%, rgba(255,255,255,.16), transparent 28%),
+    #002FA7;
+}
+.reveal.skin-international-blue .slide-surface.slide-layout-cover h1,
+.reveal.skin-international-blue .slide-surface.slide-layout-cover p {
+  color: #fff;
+}
+.reveal.skin-international-blue .slide-surface.slide-layout-cover h1::after {
+  background: #fff;
+  border-radius: 0;
+}
+.reveal.skin-international-blue .slide-surface table,
+.reveal.skin-international-blue .slide-surface th,
+.reveal.skin-international-blue .slide-surface td,
+.reveal.skin-international-blue .slide-surface pre,
+.reveal.skin-international-blue .slide-surface .callout,
+.reveal.skin-international-blue .slide-surface .chart-block {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-color: rgba(0,47,167,.32);
+}
+.reveal.skin-international-blue .slide-surface th {
+  background: #002FA7;
+  color: #fff;
+}
+
+/* ============ 赛博霓虹 neon ============ */
+.reveal.skin-neon .slide-surface {
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(255,43,214,.22), transparent 60%),
+    radial-gradient(ellipse at 85% 100%, rgba(0,240,255,.20), transparent 60%),
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 100% 36px,
+    #000;
+}
+.reveal.skin-neon .slide-surface::before {
+  display: block;
+  background: linear-gradient(90deg, #ff2bd6, #00f0ff);
+  box-shadow: 0 0 16px rgba(255,43,214,.7);
+}
+.reveal.skin-neon .slide-surface h1,
+.reveal.skin-neon .slide-surface h2,
+.reveal.skin-neon .slide-surface h3 {
+  text-shadow: 0 0 12px rgba(255,43,214,.6), 0 0 30px rgba(0,240,255,.35);
+}
+.reveal.skin-neon .slide-surface table,
+.reveal.skin-neon .slide-surface .callout,
+.reveal.skin-neon .slide-surface pre {
+  background: rgba(15,15,26,.72); backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,240,255,.45);
+  box-shadow: 0 0 24px rgba(255,43,214,.25);
+}
+.reveal.skin-neon .slide-surface blockquote {
+  border-left: 4px solid #00f0ff; box-shadow: -2px 0 16px rgba(0,240,255,.4);
+}
+
+/* ============ 极光 aurora ============ */
+.reveal.skin-aurora .slide-surface {
+  background:
+    radial-gradient(60% 50% at 20% 10%, rgba(94,242,198,.32), transparent 70%),
+    radial-gradient(55% 50% at 80% 20%, rgba(122,162,255,.30), transparent 70%),
+    radial-gradient(70% 60% at 50% 100%, rgba(201,132,255,.28), transparent 70%),
+    linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,0) 48%),
+    #06091c;
+}
+.reveal.skin-aurora .slide-surface table,
+.reveal.skin-aurora .slide-surface .callout,
+.reveal.skin-aurora .slide-surface pre,
+.reveal.skin-aurora .slide-surface .chart-block {
+  backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
+  background: rgba(255,255,255,.06); border: 1px solid rgba(180,220,255,.2);
+}
+
+/* ============ 蒸汽波 vaporwave ============ */
+.reveal.skin-vaporwave .slide-surface {
+  background:
+    linear-gradient(180deg, #1a0938 0%, #3a0f5c 45%, #7a1f6b 85%, #e85d9c 100%),
+    radial-gradient(ellipse at 50% 80%, rgba(0,245,255,.28), transparent 60%);
+}
+.reveal.skin-vaporwave .slide-surface h1,
+.reveal.skin-vaporwave .slide-surface h2 {
+  background: linear-gradient(135deg, #ff6ec7, #c94fff 35%, #00f5ff);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.reveal.skin-vaporwave .slide-surface table,
+.reveal.skin-vaporwave .slide-surface .callout,
+.reveal.skin-vaporwave .slide-surface pre { backdrop-filter: blur(16px); background: rgba(255,255,255,.06); }
+
+/* ============ 千禧铬金 y2k ============ */
+.reveal.skin-y2k .slide-surface {
+  background: linear-gradient(135deg, #c4cfe0 0%, #f0f3f8 25%, #aab8d0 50%, #f5f7fb 75%, #b8c4d8 100%);
+}
+.reveal.skin-y2k .slide-surface h1,
+.reveal.skin-y2k .slide-surface h2 {
+  background: linear-gradient(180deg, #f8faff 0%, #9aa8c4 50%, #4a5670 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.reveal.skin-y2k .slide-surface table,
+.reveal.skin-y2k .slide-surface .callout,
+.reveal.skin-y2k .slide-surface pre {
+  backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%);
+  background: rgba(255,255,255,.6); border: 1px solid rgba(120,135,170,.4); border-radius: 18px;
+}
+
+/* ============ 绿屏终端 terminal ============ */
+.reveal.skin-terminal .slide-surface {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,255,136,.05) 0 2px, transparent 2px 4px),
+    radial-gradient(circle at 50% 50%, rgba(0,255,136,.10), transparent 62%),
+    #030a04;
+  text-shadow: 0 0 2px rgba(0,255,136,.5);
+}
+.reveal.skin-terminal .slide-surface table,
+.reveal.skin-terminal .slide-surface .callout,
+.reveal.skin-terminal .slide-surface pre { background: rgba(10,27,16,.6); border: 1px solid rgba(0,255,120,.3); }
+
+/* ============ 蓝图 blueprint ============ */
+.reveal.skin-blueprint .slide-surface {
+  background:
+    linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 40px 40px,
+    #0b3a6f;
+}
+.reveal.skin-blueprint .slide-surface table,
+.reveal.skin-blueprint .slide-surface .callout,
+.reveal.skin-blueprint .slide-surface pre { border: 1px dashed rgba(190,220,255,.45); background: rgba(255,255,255,.04); }
+
+/* ============ 工程白图 engineering ============ */
+.reveal.skin-engineering .slide-surface {
+  background:
+    repeating-linear-gradient(0deg, rgba(10,30,70,.07) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(10,30,70,.07) 0 1px, transparent 1px 40px),
+    #ffffff;
+}
+.reveal.skin-engineering .slide-surface::after {
+  content: "";
+  position: absolute;
+  right: 4.2%;
+  top: 5.2%;
+  width: 17%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #1e5ac4);
+  box-shadow: 0 10px 0 rgba(30,90,196,.28), 0 20px 0 rgba(30,90,196,.16);
+  pointer-events: none;
+}
+.reveal.skin-engineering .slide-surface .slide-title {
+  background: rgba(255,255,255,.68);
+  border-radius: 8px;
+  padding-top: .14em;
+  padding-bottom: .14em;
+}
+
+/* ============ 复古显像管 retro-tv ============ */
+.reveal.skin-retro-tv .slide-surface {
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.035) 0 2px, transparent 2px 4px),
+    radial-gradient(ellipse at center, #f7ecd0 0%, #e8d9b0 85%, #c9b888 100%);
+}
+
+/* ============ 孟菲斯波普 memphis ============ */
+.reveal.skin-memphis .slide-surface {
+  background-color: #fef6e8;
+  background-image:
+    radial-gradient(circle at 10% 20%, #ff3d8b 3px, transparent 4px),
+    radial-gradient(circle at 80% 40%, #37c2d7 3px, transparent 4px),
+    radial-gradient(circle at 30% 80%, #ffcc00 3px, transparent 4px);
+  background-size: 200px 200px, 220px 220px, 260px 260px;
+}
+.reveal.skin-memphis .slide-surface table,
+.reveal.skin-memphis .slide-surface .callout,
+.reveal.skin-memphis .slide-surface pre { border: 2.5px solid #111 !important; box-shadow: 5px 5px 0 #111; }
+
+/* ============ 新闻播报 news ============ */
+.reveal.skin-news .slide-surface { box-shadow: inset 8px 0 0 #e11d2d; }
+.reveal.skin-news .slide-surface h1,
+.reveal.skin-news .slide-surface h2 { text-transform: uppercase; letter-spacing: -.01em; }
+.reveal.skin-news .slide-surface table,
+.reveal.skin-news .slide-surface .callout,
+.reveal.skin-news .slide-surface pre { border: 2px solid #0a0a0a !important; box-shadow: 6px 6px 0 #e11d2d; }
+
+/* ============ 包豪斯 bauhaus ============ */
+.reveal.skin-bauhaus .slide-surface::before {
+  display: block;
+  height: 12px;
+  background: linear-gradient(90deg, #e03c27 0 33%, #f4c430 33% 66%, #1d4eaf 66% 100%);
+}
+.reveal.skin-bauhaus .slide-surface table,
+.reveal.skin-bauhaus .slide-surface .callout,
+.reveal.skin-bauhaus .slide-surface pre { border: 2px solid #111 !important; box-shadow: 4px 4px 0 #111; border-radius: 0; }
+
+/* ============ 杂志大标题 magazine ============ */
+.reveal.skin-magazine .slide-surface h1 { font-size: clamp(2.6em, 8vw, 3.6em); line-height: .94; font-weight: 900; letter-spacing: -.03em; }
+.reveal.skin-magazine .slide-surface h1::after { content: ""; display: block; width: 90px; height: 6px; background: #ea5a1a; margin-top: .3em; }
+
+/* ============ 墨刊纸页 ink-zine ============ */
+.reveal.skin-ink-zine .slide-surface {
+  background:
+    linear-gradient(rgba(10,10,11,.026) 1px, transparent 1px) 0 0 / 100% 32px,
+    radial-gradient(circle at 12% 14%, rgba(10,31,61,.07), transparent 28%),
+    #f1efea;
+}
+.reveal.skin-ink-zine .slide-surface::before {
+  content: "";
+  display: block;
+  left: 6%;
+  right: 6%;
+  top: 5%;
+  width: auto;
+  height: 1px;
+  background: rgba(10,10,11,.42);
+}
+.reveal.skin-ink-zine .slide-surface::after {
+  content: "MORPHDRAFT JOURNAL";
+  position: absolute;
+  right: 6%;
+  top: calc(5% + 10px);
+  font-family: var(--font-family);
+  font-size: .42em;
+  font-weight: 760;
+  letter-spacing: .12em;
+  color: rgba(10,31,61,.58);
+  z-index: 0;
+}
+.reveal.skin-ink-zine .slide-surface h1,
+.reveal.skin-ink-zine .slide-surface h2 {
+  color: #0a0a0b;
+  letter-spacing: -.01em;
+}
+.reveal.skin-ink-zine .slide-surface h3 {
+  color: #0a1f3d;
+}
+.reveal.skin-ink-zine .slide-surface.slide-layout-cover {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(10,31,61,.10), transparent 26%),
+    linear-gradient(180deg, #f8f6f0, #f1efea);
+}
+.reveal.skin-ink-zine .slide-surface.slide-layout-cover .slide-inner {
+  width: min(78%, 880px);
+  margin: 0 auto;
+  text-align: center;
+}
+.reveal.skin-ink-zine .slide-surface.slide-layout-cover h1::after {
+  margin-left: auto;
+  margin-right: auto;
+  height: 2px;
+  border-radius: 0;
+  background: #0a1f3d;
+}
+.reveal.skin-ink-zine .slide-surface blockquote {
+  border-left-width: 0;
+  padding: .45em 0 .45em .95em;
+  color: #332f2a;
+  background: linear-gradient(90deg, rgba(10,31,61,.10), transparent 62%);
+}
+.reveal.skin-ink-zine .slide-surface table,
+.reveal.skin-ink-zine .slide-surface pre,
+.reveal.skin-ink-zine .slide-surface .callout,
+.reveal.skin-ink-zine .slide-surface .chart-block {
+  background: rgba(248,246,240,.72);
+  border: 1px solid rgba(10,10,11,.16);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ============ 锐利黑白 sharp-mono ============ */
+.reveal.skin-sharp-mono .slide-surface h1,
+.reveal.skin-sharp-mono .slide-surface h2,
+.reveal.skin-sharp-mono .slide-surface h3 { text-transform: uppercase; letter-spacing: -.03em; }
+.reveal.skin-sharp-mono .slide-surface table,
+.reveal.skin-sharp-mono .slide-surface .callout,
+.reveal.skin-sharp-mono .slide-surface pre { border: 2px solid #000 !important; box-shadow: 4px 4px 0 #000; border-radius: 0; }
+
+/* ============ 经典暗色配色：减少“只换色”的粗糙感 ============ */
+.reveal.skin-dracula .slide-surface,
+.reveal.skin-nord .slide-surface,
+.reveal.skin-tokyo-night .slide-surface,
+.reveal.skin-catppuccin-mocha .slide-surface,
+.reveal.skin-gruvbox .slide-surface,
+.reveal.skin-rose-pine .slide-surface {
+  background:
+    radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--primary-color) 18%, transparent), transparent 28%),
+    radial-gradient(circle at 92% 84%, color-mix(in srgb, var(--primary-color) 10%, transparent), transparent 26%),
+    linear-gradient(145deg, color-mix(in srgb, var(--panel-bg) 35%, var(--bg)), var(--bg) 56%);
+}
+.reveal.skin-dracula .slide-surface::after,
+.reveal.skin-nord .slide-surface::after,
+.reveal.skin-tokyo-night .slide-surface::after,
+.reveal.skin-catppuccin-mocha .slide-surface::after,
+.reveal.skin-gruvbox .slide-surface::after,
+.reveal.skin-rose-pine .slide-surface::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 42%, transparent), transparent);
+  pointer-events: none;
+}
+.reveal.skin-dracula .slide-surface table,
+.reveal.skin-dracula .slide-surface .callout,
+.reveal.skin-dracula .slide-surface pre,
+.reveal.skin-nord .slide-surface table,
+.reveal.skin-nord .slide-surface .callout,
+.reveal.skin-nord .slide-surface pre,
+.reveal.skin-tokyo-night .slide-surface table,
+.reveal.skin-tokyo-night .slide-surface .callout,
+.reveal.skin-tokyo-night .slide-surface pre,
+.reveal.skin-catppuccin-mocha .slide-surface table,
+.reveal.skin-catppuccin-mocha .slide-surface .callout,
+.reveal.skin-catppuccin-mocha .slide-surface pre,
+.reveal.skin-gruvbox .slide-surface table,
+.reveal.skin-gruvbox .slide-surface .callout,
+.reveal.skin-gruvbox .slide-surface pre,
+.reveal.skin-rose-pine .slide-surface table,
+.reveal.skin-rose-pine .slide-surface .callout,
+.reveal.skin-rose-pine .slide-surface pre {
+  background: color-mix(in srgb, var(--panel-bg) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 22%, var(--border));
+  border-radius: 14px;
+}
+
+/* ============ 商务 / 极简：更像正式汇报稿 ============ */
+.reveal.skin-corporate .slide-surface,
+.reveal.skin-pitch-deck .slide-surface,
+.reveal.skin-minimal-white .slide-surface,
+.reveal.skin-arctic .slide-surface,
+.reveal.skin-catppuccin-latte .slide-surface,
+.reveal.skin-solarized-light .slide-surface {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 5%, transparent), transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--panel-bg) 70%, var(--bg)), var(--bg));
+}
+.reveal.skin-corporate .slide-surface.slide-layout-default::before,
+.reveal.skin-pitch-deck .slide-surface.slide-layout-default::before,
+.reveal.skin-minimal-white .slide-surface.slide-layout-default::before,
+.reveal.skin-arctic .slide-surface.slide-layout-default::before,
+.reveal.skin-catppuccin-latte .slide-surface.slide-layout-default::before,
+.reveal.skin-solarized-light .slide-surface.slide-layout-default::before {
+  display: block;
+  left: 6%;
+  top: 5.2%;
+  width: 64px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--primary-color);
+}
+.reveal.skin-corporate .slide-surface .callout-card,
+.reveal.skin-corporate .slide-surface pre,
+.reveal.skin-corporate .slide-surface table,
+.reveal.skin-pitch-deck .slide-surface .callout-card,
+.reveal.skin-pitch-deck .slide-surface pre,
+.reveal.skin-pitch-deck .slide-surface table,
+.reveal.skin-minimal-white .slide-surface .callout-card,
+.reveal.skin-minimal-white .slide-surface pre,
+.reveal.skin-minimal-white .slide-surface table,
+.reveal.skin-arctic .slide-surface .callout-card,
+.reveal.skin-arctic .slide-surface pre,
+.reveal.skin-arctic .slide-surface table {
+  background: color-mix(in srgb, var(--panel-bg) 86%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .08);
+}
+
+/* ============ 杂志 / 文艺 / 学术：加强排版性，降低模板味 ============ */
+.reveal.skin-editorial .slide-surface,
+.reveal.skin-academic .slide-surface,
+.reveal.skin-midcentury .slide-surface,
+.reveal.skin-japanese .slide-surface,
+.reveal.skin-magazine .slide-surface {
+  background:
+    radial-gradient(circle at 90% 14%, color-mix(in srgb, var(--primary-color) 10%, transparent), transparent 26%),
+    linear-gradient(180deg, color-mix(in srgb, var(--panel-bg) 46%, var(--bg)), var(--bg));
+}
+.reveal.skin-editorial .slide-surface h1,
+.reveal.skin-editorial .slide-surface h2,
+.reveal.skin-academic .slide-surface h1,
+.reveal.skin-academic .slide-surface h2,
+.reveal.skin-midcentury .slide-surface h1,
+.reveal.skin-midcentury .slide-surface h2,
+.reveal.skin-japanese .slide-surface h1,
+.reveal.skin-japanese .slide-surface h2 {
+  letter-spacing: .01em;
+}
+.reveal.skin-editorial .slide-surface blockquote,
+.reveal.skin-academic .slide-surface blockquote,
+.reveal.skin-japanese .slide-surface blockquote {
+  background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  border-left-width: 3px;
+}
+
+/* ============ 柔和 / 社媒：更柔和但不廉价 ============ */
+.reveal.skin-soft-pastel .slide-surface,
+.reveal.skin-sunset .slide-surface,
+.reveal.skin-xiaohongshu .slide-surface,
+.reveal.skin-rainbow .slide-surface {
+  background:
+    radial-gradient(circle at 20% 12%, color-mix(in srgb, var(--primary-color) 15%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 78%, color-mix(in srgb, var(--primary-color) 9%, transparent), transparent 24%),
+    var(--bg);
+}
+.reveal.skin-soft-pastel .slide-surface .callout,
+.reveal.skin-sunset .slide-surface .callout,
+.reveal.skin-xiaohongshu .slide-surface .callout,
+.reveal.skin-rainbow .slide-surface .callout {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .07);
+}
+.reveal.skin-rainbow .slide-surface h1,
+.reveal.skin-rainbow .slide-surface h2 {
+  background: linear-gradient(90deg, #ff4d8b, #8b5cf6 45%, #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ============ 高级感补丁：统一提升弱皮肤的材质、边界与层级 ============ */
+.reveal[class*="skin-"] .slide-surface .slide-body > .callout-card,
+.reveal[class*="skin-"] .slide-surface .slide-body > .callout-note,
+.reveal[class*="skin-"] .slide-surface .slide-body > pre,
+.reveal[class*="skin-"] .slide-surface .slide-body > table,
+.reveal[class*="skin-"] .slide-surface .slide-body > .chart-block {
+  position: relative;
+}
+
+.reveal.skin-y2k .slide-surface {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.62),
+    inset 0 0 46px rgba(255,255,255,.28);
+}
+.reveal.skin-y2k .slide-surface::after {
+  content: "";
+  position: absolute;
+  inset: 4.4% 4.8%;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.8),
+    0 18px 42px rgba(70,82,120,.14);
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-y2k .slide-surface .callout,
+.reveal.skin-y2k .slide-surface pre,
+.reveal.skin-y2k .slide-surface table {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 18px 36px rgba(76,86,120,.14);
+}
+
+.reveal.skin-vaporwave .slide-surface::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background:
+    linear-gradient(0deg, rgba(0,245,255,.26) 1px, transparent 1px) 0 0 / 100% 28px,
+    linear-gradient(90deg, rgba(0,245,255,.18) 1px, transparent 1px) 0 0 / 44px 100%,
+    linear-gradient(180deg, transparent, rgba(0,0,0,.28));
+  transform-origin: bottom;
+  transform: perspective(480px) rotateX(58deg);
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-vaporwave .slide-surface .slide-inner {
+  text-shadow: 0 0 18px rgba(255,110,199,.18);
+}
+
+.reveal.skin-blueprint .slide-surface {
+  box-shadow: inset 0 0 0 1px rgba(190,220,255,.22);
+}
+.reveal.skin-blueprint .slide-surface::after {
+  content: "";
+  position: absolute;
+  inset: 5.2%;
+  border: 1px solid rgba(190,220,255,.28);
+  background:
+    linear-gradient(90deg, rgba(190,220,255,.30) 0 18px, transparent 18px calc(100% - 18px), rgba(190,220,255,.30) calc(100% - 18px)),
+    linear-gradient(0deg, rgba(190,220,255,.30) 0 18px, transparent 18px calc(100% - 18px), rgba(190,220,255,.30) calc(100% - 18px));
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-blueprint .slide-surface h1,
+.reveal.skin-blueprint .slide-surface h2 {
+  text-shadow: 0 0 18px rgba(174,225,255,.24);
+}
+
+.reveal.skin-retro-tv .slide-surface {
+  box-shadow: inset 0 0 90px rgba(59,38,9,.16);
+}
+.reveal.skin-retro-tv .slide-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 56%, rgba(50,32,8,.20) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.10) 0 1px, rgba(0,0,0,.035) 1px 3px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-retro-tv .slide-surface h1,
+.reveal.skin-retro-tv .slide-surface h2 {
+  text-shadow: 1px 1px 0 rgba(255,255,255,.5), -1px 0 0 rgba(199,58,31,.16);
+}
+
+.reveal.skin-corporate .slide-surface::after,
+.reveal.skin-pitch-deck .slide-surface::after,
+.reveal.skin-minimal-white .slide-surface::after,
+.reveal.skin-arctic .slide-surface::after,
+.reveal.skin-catppuccin-latte .slide-surface::after,
+.reveal.skin-solarized-light .slide-surface::after {
+  content: "";
+  position: absolute;
+  right: 6%;
+  top: 5.4%;
+  width: min(26%, 260px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-color) 40%, transparent));
+  box-shadow:
+    0 11px 0 color-mix(in srgb, var(--primary-color) 14%, transparent),
+    0 22px 0 color-mix(in srgb, var(--primary-color) 8%, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-minimal-white .slide-surface,
+.reveal.skin-arctic .slide-surface {
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,.045);
+}
+.reveal.skin-minimal-white .slide-surface h1,
+.reveal.skin-minimal-white .slide-surface h2 {
+  letter-spacing: -.01em;
+}
+
+.reveal.skin-editorial .slide-surface::after,
+.reveal.skin-academic .slide-surface::after,
+.reveal.skin-midcentury .slide-surface::after,
+.reveal.skin-japanese .slide-surface::after,
+.reveal.skin-magazine .slide-surface::after {
+  content: "MORPHDRAFT";
+  position: absolute;
+  right: 6%;
+  bottom: 4.8%;
+  font-size: .42em;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: color-mix(in srgb, var(--muted) 54%, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+.reveal.skin-academic .slide-surface .slide-title,
+.reveal.skin-editorial .slide-surface .slide-title,
+.reveal.skin-japanese .slide-surface .slide-title {
+  border-left-width: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 34%, transparent);
+  padding-left: 0;
+  padding-bottom: .26em;
+}
+
+.reveal.skin-soft-pastel .slide-surface .callout-card,
+.reveal.skin-sunset .slide-surface .callout-card,
+.reveal.skin-xiaohongshu .slide-surface .callout-card,
+.reveal.skin-rainbow .slide-surface .callout-card,
+.reveal.skin-soft-pastel .slide-surface pre,
+.reveal.skin-sunset .slide-surface pre,
+.reveal.skin-xiaohongshu .slide-surface pre,
+.reveal.skin-rainbow .slide-surface pre {
+  border: 1px solid color-mix(in srgb, var(--primary-color) 16%, var(--border));
+  background: color-mix(in srgb, var(--panel-bg) 88%, transparent);
+  box-shadow: 0 16px 36px rgba(15,23,42,.08);
+}
+.reveal.skin-xiaohongshu .slide-surface h1,
+.reveal.skin-xiaohongshu .slide-surface h2 {
+  text-shadow: 0 10px 30px rgba(255,39,66,.12);
+}
+.reveal.skin-rainbow .slide-surface::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 5%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff4d8b, #f59e0b, #22c55e, #06b6d4, #8b5cf6);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============ 商务蓝 business-blue ============ */
+/* 参考 output/imagegen/ppt-mixed-layouts：左上字母角标页眉条 + 页脚品牌 + 白面板卡 + 紧凑斑马表。
+   页眉条（角标+标题）由 structure.ts 注入 .slide-header（chrome 皮肤白名单见 reveal.ts CHROME_SKINS）。 */
+.reveal.skin-business-blue .slide-surface {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary-color) 6%, var(--bg)) 0, var(--bg) 14%),
+    var(--bg);
+}
+
+/* 内容页让出底部页脚带 */
+.reveal.skin-business-blue .slide-surface.slide-layout-default {
+    padding-bottom: 6.6%;
+}
+
+/* 页眉条：字母角标 + 标题 + 底部分隔线 */
+.reveal.skin-business-blue .slide-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    margin-bottom: 0.7em;
+    padding-bottom: 0.45em;
+    border-bottom: 2px solid color-mix(in srgb, var(--primary-color) 22%, var(--border));
+}
+
+.reveal.skin-business-blue .slide-header-badge {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 9px;
+    background: var(--primary-color);
+    color: #fff;
+    font-family: var(--heading-family);
+    font-weight: 800;
+    font-size: 0.86em;
+    line-height: 1;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 32%, transparent);
+}
+
+.reveal.skin-business-blue .slide-header-badge.is-cont {
+    background: color-mix(in srgb, var(--primary-color) 26%, transparent);
+}
+
+/* 标题进了页眉条 → 去掉左竖条，自身不再带下边距 */
+.reveal.skin-business-blue .slide-header .slide-title {
+    margin: 0;
+    padding-left: 0;
+    border-left: none;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+/* 右上分类标签（药丸样式） */
+.reveal.skin-business-blue .slide-header-tag {
+    flex: 0 0 auto;
+    align-self: center;
+    padding: 0.18em 0.7em;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: color-mix(in srgb, var(--primary-color) 82%, var(--fg));
+    font-size: 0.6em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+/* 页脚品牌（左下） */
+.reveal.skin-business-blue .slide-surface::after {
+    content: "▪ Morphixel";
+    position: absolute;
+    left: 6%;
+    bottom: 4.4%;
+    font-family: var(--font-family);
+    font-size: .42em;
+    font-weight: 800;
+    letter-spacing: .12em;
+    color: color-mix(in srgb, var(--primary-color) 70%, var(--muted));
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* 标题：深蓝字 + 左侧主色竖条 */
+.reveal.skin-business-blue .slide-surface h1,
+.reveal.skin-business-blue .slide-surface h2 {
+    color: color-mix(in srgb, var(--primary-color) 78%, var(--fg));
+    letter-spacing: -.01em;
+}
+
+.reveal.skin-business-blue .slide-surface .slide-title {
+    border-left-color: var(--primary-color);
+}
+
+.reveal.skin-business-blue .slide-surface a {
+    color: var(--primary-color);
+}
+
+/* 面板卡：白底 + 细线 + 轻阴影 + 圆角 */
+.reveal.skin-business-blue .slide-surface .callout-card,
+.reveal.skin-business-blue .slide-surface .callout-note,
+.reveal.skin-business-blue .slide-surface pre,
+.reveal.skin-business-blue .slide-surface table,
+.reveal.skin-business-blue .slide-surface .chart-card,
+.reveal.skin-business-blue .slide-surface .chart-block {
+    background: var(--panel-bg);
+    border: 1px solid var(--skin-hairline);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(26, 34, 51, .07);
+}
+
+/* 紧凑斑马表：蓝调表头 + 隔行浅蓝 + 去内边框留外圆角 */
+.reveal.skin-business-blue .slide-surface table {
+    overflow: hidden;
+}
+
+.reveal.skin-business-blue .slide-surface th {
+    background: color-mix(in srgb, var(--primary-color) 12%, var(--panel-bg));
+    color: color-mix(in srgb, var(--primary-color) 82%, var(--fg));
+    font-weight: 700;
+    border-color: var(--skin-hairline);
+}
+
+.reveal.skin-business-blue .slide-surface td {
+    border-color: color-mix(in srgb, var(--skin-hairline) 60%, transparent);
+}
+
+.reveal.skin-business-blue .slide-surface tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--primary-color) 4%, transparent);
+}
+
+/* 引用：浅蓝卡片化 */
+.reveal.skin-business-blue .slide-surface blockquote {
+    background: color-mix(in srgb, var(--primary-color) 6%, var(--panel-bg));
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 12px 12px 0;
+    padding: .5em .9em;
+    color: var(--fg);
+}
+
+/* KPI 强调：加粗数字偏主色，强化设计稿的「大数字」观感 */
+.reveal.skin-business-blue .slide-surface .callout-card strong,
+.reveal.skin-business-blue .slide-surface blockquote strong {
+    color: var(--primary-color);
+}
+
+/* 封面：蓝色实底 + 白字（呼应设计稿封面调性） */
+.reveal.skin-business-blue .slide-surface.slide-layout-cover {
+    background: radial-gradient(circle at 86% 16%, rgba(255, 255, 255, .14), transparent 30%),
+    linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 92%, #000), var(--primary-color) 70%);
+}
+
+.reveal.skin-business-blue .slide-surface.slide-layout-cover h1,
+.reveal.skin-business-blue .slide-surface.slide-layout-cover h2,
+.reveal.skin-business-blue .slide-surface.slide-layout-cover p {
+    color: #fff;
+}
+
+.reveal.skin-business-blue .slide-surface.slide-layout-cover h1::after {
+    background: #fff;
+}
+
+.reveal.skin-business-blue .slide-surface.slide-layout-cover::after {
+    color: rgba(255, 255, 255, .82);
+}
+
+/* 章节页：浅蓝大色块 */
+.reveal.skin-business-blue .slide-surface.slide-layout-section h1,
+.reveal.skin-business-blue .slide-surface.slide-layout-section h2 {
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border));
+}
