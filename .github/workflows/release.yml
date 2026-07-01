@@ -21,7 +21,9 @@ jobs:
             args: '--bundles appimage,deb,rpm'
           - platform: windows-latest
             rust-targets: ''
-            args: '--bundles nsis,msi'
+            # 只打 NSIS（.exe 安装包）；MSI 不支持版本号里的 -beta 等非数字后缀，先不打。
+            # 若将来版本号改为纯数字（如 0.1.0）并确需 MSI，可改回 '--bundles nsis,msi'。
+            args: '--bundles nsis'
 
     runs-on: ${{ matrix.platform }}
     steps:
