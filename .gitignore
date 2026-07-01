@@ -3,7 +3,7 @@ dist/
 *.local
 .DS_Store
 plan
-design
+ip
 
 # Editor metadata
 *.iml
@@ -13,7 +13,6 @@ design
 .claude
 .codex
 
-app-icon.png
 src-tauri/DESKTOP.md
 package-lock.json
 
